@@ -8,6 +8,9 @@ struct RunsView: View {
 
     @State private var addingRun = false
     @State private var completing: RunEntry?
+    @State private var strava = StravaService.shared
+    @State private var syncing = false
+    @State private var errorText: String?
 
     private var upcoming: [RunEntry] {
         runs.filter { !$0.completed }.sorted { $0.date < $1.date }
@@ -18,6 +21,31 @@ struct RunsView: View {
 
     var body: some View {
         List {
+            Section("Strava") {
+                if strava.isConnected {
+                    Button {
+                        Task { await sync() }
+                    } label: {
+                        if syncing { HStack { ProgressView(); Text("Syncing…") } }
+                        else { Label("Sync runs from Strava", systemImage: "arrow.triangle.2.circlepath") }
+                    }
+                    .disabled(syncing)
+                    Button("Disconnect Strava", role: .destructive) { strava.disconnect() }
+                } else {
+                    Button {
+                        Task { await connect() }
+                    } label: {
+                        Label("Connect Strava", systemImage: "link")
+                    }
+                }
+                if let msg = strava.lastSyncMessage {
+                    Text(msg).font(.caption).foregroundStyle(.secondary)
+                }
+                if let errorText {
+                    Text(errorText).font(.caption).foregroundStyle(.red)
+                }
+            }
+
             Section("Planned") {
                 if upcoming.isEmpty {
                     Text("No runs planned.").foregroundStyle(.secondary)
@@ -44,8 +72,20 @@ struct RunsView: View {
                 }
                 ForEach(completed) { run in
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("\(run.actualDistanceKm ?? 0, specifier: "%.1f") km")
-                            .font(.headline)
+                        HStack {
+                            Text("\(run.actualDistanceKm ?? 0, specifier: "%.1f") km")
+                                .font(.headline)
+                            if run.source == .strava {
+                                Text("Strava")
+                                    .font(.caption2.weight(.semibold))
+                                    .padding(.horizontal, 6).padding(.vertical, 2)
+                                    .background(Color.orange.opacity(0.2))
+                                    .clipShape(Capsule())
+                            }
+                        }
+                        if !run.name.isEmpty {
+                            Text(run.name).font(.subheadline)
+                        }
                         HStack {
                             Text(run.date.formatted(date: .abbreviated, time: .omitted))
                             if let pace = run.pace {
@@ -68,6 +108,27 @@ struct RunsView: View {
 
     private func delete(_ list: [RunEntry], _ offsets: IndexSet) {
         for i in offsets { context.delete(list[i]) }
+    }
+
+    private func connect() async {
+        errorText = nil
+        do {
+            try await strava.connect()
+            await sync()
+        } catch {
+            errorText = error.localizedDescription
+        }
+    }
+
+    private func sync() async {
+        errorText = nil
+        syncing = true
+        defer { syncing = false }
+        do {
+            try await strava.syncRuns(into: context)
+        } catch {
+            errorText = error.localizedDescription
+        }
     }
 }
 

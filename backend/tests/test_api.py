@@ -40,6 +40,19 @@ def test_heuristic_workout_categorizes_arms():
     assert len(parsed["exercises"]) >= 2
 
 
+def test_strava_config_not_configured():
+    r = client.get("/strava/config")
+    assert r.status_code == 200
+    body = r.json()
+    assert "clientId" in body and "configured" in body
+
+
+def test_strava_exchange_requires_config():
+    # No client id/secret in the test env → should be a clean 503, not a crash.
+    r = client.post("/strava/exchange", json={"code": "abc"})
+    assert r.status_code == 503
+
+
 def test_heuristic_meals_fit_budget():
     meals = recommend_meals(
         MacroTargets(kcal=600, proteinG=50, carbsG=60, fatG=20), "any", ""

@@ -31,6 +31,17 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.reelfit.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>reelfit</string>
+			</array>
+		</dict>
+	</array>
 	<key>NSHealthShareUsageDescription</key>
 	<string>ReelFit reads your step count and body data to show your daily activity and progress.</string>
 	<key>NSHealthUpdateUsageDescription</key>

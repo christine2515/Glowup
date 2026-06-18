@@ -18,7 +18,9 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI, Header, HTTPException
 
-from . import ai, extract, nutrition
+from pydantic import BaseModel
+
+from . import ai, extract, nutrition, strava
 from .schemas import (
     ExtractRequest,
     ExtractResponse,
@@ -104,3 +106,46 @@ def food_search(
 ) -> FoodSearchResponse:
     _check_token(x_reelfit_token)
     return FoodSearchResponse(items=nutrition.search_foods(q))
+
+
+# ----------------------------- Strava ------------------------------------- #
+
+class StravaConfig(BaseModel):
+    clientId: str
+    configured: bool
+
+
+class StravaCodeBody(BaseModel):
+    code: str
+
+
+class StravaRefreshBody(BaseModel):
+    refreshToken: str
+
+
+class StravaTokens(BaseModel):
+    accessToken: str
+    refreshToken: str
+    expiresAt: int
+
+
+@app.get("/strava/config", response_model=StravaConfig)
+def strava_config(x_reelfit_token: str | None = Header(default=None)) -> StravaConfig:
+    _check_token(x_reelfit_token)
+    return StravaConfig(clientId=strava.client_id(), configured=strava.is_configured())
+
+
+@app.post("/strava/exchange", response_model=StravaTokens)
+def strava_exchange(
+    body: StravaCodeBody, x_reelfit_token: str | None = Header(default=None)
+) -> StravaTokens:
+    _check_token(x_reelfit_token)
+    return StravaTokens(**strava.exchange_code(body.code))
+
+
+@app.post("/strava/refresh", response_model=StravaTokens)
+def strava_refresh(
+    body: StravaRefreshBody, x_reelfit_token: str | None = Header(default=None)
+) -> StravaTokens:
+    _check_token(x_reelfit_token)
+    return StravaTokens(**strava.refresh(body.refreshToken))

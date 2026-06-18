@@ -51,6 +51,17 @@ struct FoodResult: Codable, Identifiable {
     var fatG: Double
 }
 
+struct StravaConfig: Codable {
+    var clientId: String
+    var configured: Bool
+}
+
+struct StravaTokens: Codable {
+    var accessToken: String
+    var refreshToken: String
+    var expiresAt: Int
+}
+
 enum BackendError: LocalizedError {
     case notConfigured
     case badResponse(Int)
@@ -100,6 +111,22 @@ struct BackendClient {
         let q = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let r: Response = try await get("/nutrition/search?q=\(q)")
         return r.items
+    }
+
+    // MARK: - Strava token operations (client secret stays on the backend)
+
+    func stravaConfig() async throws -> StravaConfig {
+        try await get("/strava/config")
+    }
+
+    func stravaExchange(code: String) async throws -> StravaTokens {
+        struct Body: Codable { let code: String }
+        return try await post("/strava/exchange", body: Body(code: code))
+    }
+
+    func stravaRefresh(refreshToken: String) async throws -> StravaTokens {
+        struct Body: Codable { let refreshToken: String }
+        return try await post("/strava/refresh", body: Body(refreshToken: refreshToken))
     }
 
     // MARK: - Plumbing

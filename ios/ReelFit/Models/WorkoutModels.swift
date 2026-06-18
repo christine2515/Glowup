@@ -154,7 +154,12 @@ final class SetLog {
     }
 }
 
-/// Planned or completed run for training (Phase 2 wires the full UI).
+enum RunSource: String, Codable {
+    case manual, strava
+}
+
+/// Planned or completed run for training. Runs imported from Strava use
+/// `source == .strava` and carry the Strava activity id in `externalID`.
 @Model
 final class RunEntry {
     var date: Date = Date()
@@ -163,10 +168,18 @@ final class RunEntry {
     var actualDurationMin: Double?
     var notes: String = ""
     var completed: Bool = false
+    var name: String = ""
+    var sourceRaw: String = RunSource.manual.rawValue
+    var externalID: String?
 
     init(date: Date = Date(), plannedDistanceKm: Double = 0) {
         self.date = date
         self.plannedDistanceKm = plannedDistanceKm
+    }
+
+    var source: RunSource {
+        get { RunSource(rawValue: sourceRaw) ?? .manual }
+        set { sourceRaw = newValue.rawValue }
     }
 
     /// min/km, when completed.

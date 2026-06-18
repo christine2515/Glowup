@@ -21,6 +21,7 @@ See the phase tracker / `ios` source for what's stubbed vs. live.
 | Reel import → AI workout → categorized library | ✅ working |
 | Daily training log (pick a saved workout, edit sets) | ✅ working |
 | Run planner, progress charts | ✅ working |
+| Strava import (Coros → Strava → ReelFit runs) | ✅ working |
 | Nutrition: macro rings, meal log, food search, AI meal ideas | ✅ working |
 | Water, supplements, weight trend, steps | ✅ working |
 | Today dashboard (rings, steps, water, supplements, weight) | ✅ working |
@@ -71,6 +72,22 @@ In Xcode:
   appears under **Workouts → Shared from Instagram** → tap to import.
 - Or tap **+** in Workouts and paste a reel link.
 - If a reel can't be read automatically, the app asks you to paste the caption.
+
+## Connect Strava (for your Coros runs)
+
+Your Coros runs auto-export to Strava; ReelFit imports them from there.
+
+1. Create a free API app at <https://www.strava.com/settings/api>.
+   - Set **Authorization Callback Domain** to exactly: `reelfit.app`
+   - Note the **Client ID** and **Client Secret**.
+2. In `backend/.env` set `STRAVA_CLIENT_ID` and `STRAVA_CLIENT_SECRET`, restart
+   the backend.
+3. In the app: **Train → Runs → Connect Strava**, approve in the Strava login
+   sheet, then **Sync runs**. Runs appear in the Completed list (tagged
+   “Strava”) and in the progress chart.
+
+The client secret stays on the backend; the app only ever holds the OAuth
+access/refresh tokens (in the Keychain).
 
 ## Enable iCloud sync (optional, Phase 5)
 
