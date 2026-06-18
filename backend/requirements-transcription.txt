@@ -1,0 +1,4 @@
+# Optional: enables audio transcription of caption-less reels.
+# Heavy (downloads a Whisper model on first use). Install only if you want it:
+#   pip install -r requirements-transcription.txt
+faster-whisper==1.1.0

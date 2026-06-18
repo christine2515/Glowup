@@ -51,3 +51,38 @@ def fetch_reel_meta(url: str) -> Optional[ReelMeta]:
     duration = int(duration) if isinstance(duration, (int, float)) else None
 
     return ReelMeta(caption=caption.strip(), thumbnail_url=thumbnail, duration_sec=duration)
+
+
+def download_audio(url: str) -> Optional[str]:
+    """Download the reel's best audio track to a temp file. Returns the path
+    (caller is responsible for cleaning up the parent dir), or None on failure.
+    No ffmpeg required — we keep the native container (m4a/webm)."""
+    try:
+        import yt_dlp
+    except ImportError:
+        return None
+
+    import os
+    import tempfile
+
+    tmpdir = tempfile.mkdtemp(prefix="reelfit_")
+    outtmpl = os.path.join(tmpdir, "audio.%(ext)s")
+    opts = {
+        "quiet": True,
+        "no_warnings": True,
+        "noplaylist": True,
+        "format": "bestaudio/best",
+        "outtmpl": outtmpl,
+    }
+    try:
+        with yt_dlp.YoutubeDL(opts) as ydl:
+            info = ydl.extract_info(url, download=True)
+        ext = info.get("ext", "m4a")
+        path = os.path.join(tmpdir, f"audio.{ext}")
+        if os.path.exists(path):
+            return path
+        files = [os.path.join(tmpdir, f) for f in os.listdir(tmpdir)]
+        return files[0] if files else None
+    except Exception as exc:
+        log.warning("audio download failed for %s: %s", url, exc)
+        return None

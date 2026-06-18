@@ -7,10 +7,12 @@ Last updated: 2026-06-18. Keep this in mind when using or extending the app.
   arbitrary reels. Extraction uses `yt-dlp` to read the public page, which
   **violates Instagram's ToS** and **breaks whenever Instagram changes** its
   site. Treat it as best-effort.
-- **Caption-only by default.** Most workout reels put the routine in the
-  caption, which works well. Reels where the workout is **only spoken/shown in
-  the video** (no caption) will *not* auto-extract yet — audio transcription is
-  designed but **not built**.
+- **Caption first, audio transcription as fallback.** Most workout reels put
+  the routine in the caption. For caption-less reels, the backend can download
+  the audio and transcribe it (faster-whisper) before falling back to manual
+  paste. Transcription is **optional/heavy** (`pip install -r
+  requirements-transcription.txt`), runs on CPU, and is **not runtime-tested in
+  this build** — quality depends on the Whisper model size and audio clarity.
 - **Always-available fallback:** if auto-read fails, the app asks you to paste
   the caption manually, so you can always save a workout.
 - **AI quality needs a key.** Good structuring (form cues, sets/reps,

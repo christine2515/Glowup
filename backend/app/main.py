@@ -20,7 +20,7 @@ from fastapi import FastAPI, Header, HTTPException
 
 from pydantic import BaseModel
 
-from . import ai, extract, nutrition, strava
+from . import ai, extract, nutrition, strava, transcribe
 from .schemas import (
     ExtractRequest,
     ExtractResponse,
@@ -62,6 +62,10 @@ def extract_reel(
         if meta:
             caption = meta.caption
             thumbnail = meta.thumbnail_url
+
+    # If still nothing, try transcribing the video's audio (caption-less reels).
+    if not caption:
+        caption = transcribe.transcribe_reel(req.url)
 
     if not caption:
         # Couldn't read the reel and nothing pasted — ask the app to retry

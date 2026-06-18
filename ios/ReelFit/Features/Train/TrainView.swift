@@ -28,6 +28,11 @@ struct TrainView: View {
                     } label: {
                         Label("Progress charts", systemImage: "chart.xyaxis.line")
                     }
+                    NavigationLink {
+                        CalendarHeatmapView()
+                    } label: {
+                        Label("Workout calendar", systemImage: "calendar")
+                    }
                 }
 
                 Section("History") {

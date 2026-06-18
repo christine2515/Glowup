@@ -5,6 +5,7 @@ struct WorkoutDetailView: View {
     @Bindable var workout: WorkoutTemplate
     @Environment(\.modelContext) private var context
     @State private var loggedConfirmation = false
+    @State private var editing = false
 
     var body: some View {
         List {
@@ -55,6 +56,12 @@ struct WorkoutDetailView: View {
         }
         .navigationTitle(workout.title)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            Button("Edit") { editing = true }
+        }
+        .sheet(isPresented: $editing) {
+            EditWorkoutView(workout: workout)
+        }
         .alert("Logged!", isPresented: $loggedConfirmation) {
             Button("OK", role: .cancel) {}
         } message: {

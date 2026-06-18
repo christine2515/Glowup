@@ -18,7 +18,7 @@ See the phase tracker / `ios` source for what's stubbed vs. live.
 
 | Pillar | State |
 |---|---|
-| Reel import → AI workout → categorized library | ✅ working |
+| Reel import → AI workout (caption or audio transcript) → editable, categorized library | ✅ working |
 | Daily training log (pick a saved workout, edit sets) | ✅ working |
 | Run planner, progress charts | ✅ working |
 | Strava import (Coros → Strava → ReelFit runs) | ✅ working |
@@ -42,6 +42,9 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 - Find your Mac's LAN IP (`ipconfig getifaddr en0`) — the phone uses
   `http://<that-ip>:8000`.
 - Tests: `python -m pytest`
+- **Caption-less reels (optional):** to transcribe reels that only speak the
+  workout, `pip install -r requirements-transcription.txt` (heavy; downloads a
+  Whisper model on first use).
 
 ## 2. Build the iOS app
 

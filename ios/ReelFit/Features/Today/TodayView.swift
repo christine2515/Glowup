@@ -13,6 +13,7 @@ struct TodayView: View {
     @Query(sort: \Supplement.createdAt) private var supplements: [Supplement]
     @Query(sort: \WorkoutSession.date, order: .reverse) private var sessions: [WorkoutSession]
     @Query(sort: \BodyMetric.date, order: .reverse) private var metrics: [BodyMetric]
+    @Query private var runs: [RunEntry]
 
     private var target: NutritionTarget? { targets.first }
     private var todayMeals: [Meal] { allMeals.filter { Calendar.current.isDateInToday($0.date) } }
@@ -27,6 +28,10 @@ struct TodayView: View {
     }
     private var todaySessions: [WorkoutSession] {
         sessions.filter { Calendar.current.isDateInToday($0.date) }
+    }
+    private var todayRuns: [RunEntry] {
+        runs.filter { $0.completed && Calendar.current.isDateInToday($0.date) }
+            .sorted { $0.date > $1.date }
     }
     private var supplementsTaken: Int {
         supplements.reduce(0) { acc, s in
@@ -55,6 +60,14 @@ struct TodayView: View {
                     ForEach(todaySessions) { s in
                         LabeledContent(s.templateTitle.isEmpty ? "Workout" : s.templateTitle,
                                        value: s.date.formatted(date: .omitted, time: .shortened))
+                    }
+                    ForEach(todayRuns) { run in
+                        LabeledContent {
+                            Text("\(run.actualDistanceKm ?? 0, specifier: "%.1f") km")
+                        } label: {
+                            Label(run.name.isEmpty ? "Run" : run.name,
+                                  systemImage: "figure.run")
+                        }
                     }
                 }
 
