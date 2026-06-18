@@ -22,7 +22,8 @@ See the phase tracker / `ios` source for what's stubbed vs. live.
 | Daily training log (pick a saved workout, edit sets) | ✅ working |
 | Run planner, progress charts | ✅ working |
 | Nutrition: macro rings, meal log, food search, AI meal ideas | ✅ working |
-| Water, supplements, weight, steps | 🔶 steps + settings in; rest Phase 4 |
+| Water, supplements, weight trend, steps | ✅ working |
+| Today dashboard (rings, steps, water, supplements, weight) | ✅ working |
 | iCloud sync | ⏳ Phase 5 (one-line toggle, needs paid Apple account) |
 
 ## 1. Run the backend

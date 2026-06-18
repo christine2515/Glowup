@@ -23,10 +23,16 @@ final class AppConfig {
         didSet { defaults.set(useMetric, forKey: "useMetric") }
     }
 
+    /// Daily water goal in millilitres.
+    var waterGoalML: Double {
+        didSet { defaults.set(waterGoalML, forKey: "waterGoalML") }
+    }
+
     private init() {
         backendURL = defaults.string(forKey: "backendURL") ?? ""
         apiToken = defaults.string(forKey: "apiToken") ?? ""
         useMetric = defaults.object(forKey: "useMetric") as? Bool ?? true
+        waterGoalML = defaults.object(forKey: "waterGoalML") as? Double ?? 2500
     }
 
     var isBackendConfigured: Bool {
