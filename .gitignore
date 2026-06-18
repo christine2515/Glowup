@@ -1,0 +1,13 @@
+# Python
+backend/.venv/
+__pycache__/
+*.pyc
+backend/.env
+.pytest_cache/
+
+# Xcode / generated project
+ios/ReelFit.xcodeproj/
+ios/build/
+ios/DerivedData/
+*.xcuserstate
+.DS_Store
