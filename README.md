@@ -19,8 +19,8 @@ See the phase tracker / `ios` source for what's stubbed vs. live.
 | Pillar | State |
 |---|---|
 | Reel import → AI workout → categorized library | ✅ working |
-| Daily training log (basic) | ✅ basic (log from a workout) |
-| Run planner, progress charts | ⏳ Phase 2 |
+| Daily training log (pick a saved workout, edit sets) | ✅ working |
+| Run planner, progress charts | ✅ working |
 | Nutrition, macros, meal AI | ⏳ Phase 3 (backend endpoints ready) |
 | Water, supplements, weight, steps | 🔶 steps + settings in; rest Phase 4 |
 | iCloud sync | ⏳ Phase 5 (one-line toggle, needs paid Apple account) |
