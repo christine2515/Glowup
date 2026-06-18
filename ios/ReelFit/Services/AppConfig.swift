@@ -28,11 +28,24 @@ final class AppConfig {
         didSet { defaults.set(waterGoalML, forKey: "waterGoalML") }
     }
 
+    /// Opt into iCloud (CloudKit) sync. Takes effect on next launch and only
+    /// works with the CloudKit entitlement + a paid Apple Developer account.
+    var useICloudSync: Bool {
+        didSet { defaults.set(useICloudSync, forKey: AppConfig.iCloudKey) }
+    }
+
+    /// Read without instantiating the singleton (used at container creation).
+    static let iCloudKey = "useICloudSync"
+    static var iCloudSyncEnabled: Bool {
+        UserDefaults.standard.bool(forKey: iCloudKey)
+    }
+
     private init() {
         backendURL = defaults.string(forKey: "backendURL") ?? ""
         apiToken = defaults.string(forKey: "apiToken") ?? ""
         useMetric = defaults.object(forKey: "useMetric") as? Bool ?? true
         waterGoalML = defaults.object(forKey: "waterGoalML") as? Double ?? 2500
+        useICloudSync = defaults.bool(forKey: AppConfig.iCloudKey)
     }
 
     var isBackendConfigured: Bool {

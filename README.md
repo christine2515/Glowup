@@ -24,7 +24,7 @@ See the phase tracker / `ios` source for what's stubbed vs. live.
 | Nutrition: macro rings, meal log, food search, AI meal ideas | ✅ working |
 | Water, supplements, weight trend, steps | ✅ working |
 | Today dashboard (rings, steps, water, supplements, weight) | ✅ working |
-| iCloud sync | ⏳ Phase 5 (one-line toggle, needs paid Apple account) |
+| iCloud sync | ✅ toggle in Settings (needs paid Apple account + CloudKit capability) |
 
 ## 1. Run the backend
 
@@ -71,6 +71,21 @@ In Xcode:
   appears under **Workouts → Shared from Instagram** → tap to import.
 - Or tap **+** in Workouts and paste a reel link.
 - If a reel can't be read automatically, the app asks you to paste the caption.
+
+## Enable iCloud sync (optional, Phase 5)
+
+Off by default (local-only). To turn on cross-device sync:
+
+1. Join the **paid Apple Developer Program**.
+2. In Xcode, select the **ReelFit** target → **Signing & Capabilities** →
+   **+ Capability** → **iCloud** → check **CloudKit** and add a container
+   (e.g. `iCloud.com.reelfit.app`). XcodeGen will keep this if you also add the
+   matching keys to `ios/ReelFit/ReelFit.entitlements`.
+3. In the app: **Me → Settings → iCloud sync** ON, then relaunch.
+
+The model layer is already CloudKit-compatible (optional relationships,
+defaults). If the entitlement is missing, the app safely falls back to local
+storage instead of crashing.
 
 ## Caveats
 

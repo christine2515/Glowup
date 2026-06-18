@@ -30,6 +30,14 @@ struct SettingsView: View {
                 Stepper("\(Int(config.waterGoalML)) ml/day",
                         value: $config.waterGoalML, in: 500...6000, step: 250)
             }
+
+            Section {
+                Toggle("iCloud sync", isOn: $config.useICloudSync)
+            } header: {
+                Text("Sync")
+            } footer: {
+                Text("Syncs your data across devices via your iCloud account. Requires the CloudKit capability and a paid Apple Developer account. Restart the app after changing this.")
+            }
         }
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)

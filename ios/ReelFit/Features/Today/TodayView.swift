@@ -72,6 +72,9 @@ struct TodayView: View {
                 }
             }
             .navigationTitle(Date().formatted(date: .complete, time: .omitted))
+            .refreshable {
+                if health.authorized { await health.refreshTodaySteps() }
+            }
             .task {
                 if health.authorized { await health.refreshTodaySteps() }
             }

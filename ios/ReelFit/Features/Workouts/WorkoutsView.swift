@@ -3,6 +3,7 @@ import SwiftData
 
 struct WorkoutsView: View {
     @Environment(PendingReels.self) private var pending
+    @Environment(\.modelContext) private var context
     @Query(sort: \WorkoutTemplate.createdAt, order: .reverse)
     private var workouts: [WorkoutTemplate]
 
@@ -42,6 +43,9 @@ struct WorkoutsView: View {
                                 } label: {
                                     WorkoutRow(workout: workout)
                                 }
+                            }
+                            .onDelete { offsets in
+                                for i in offsets { context.delete(items[i]) }
                             }
                         }
                     }

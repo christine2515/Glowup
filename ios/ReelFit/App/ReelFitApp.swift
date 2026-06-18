@@ -19,9 +19,10 @@ struct ReelFitApp: App {
         .modelContainer(container)
     }
 
-    /// Local-only store for now. To enable iCloud sync (Phase 5, needs a paid
-    /// Apple Developer account + CloudKit entitlement), change
-    /// `cloudKitDatabase: .none` to `.automatic`.
+    /// Builds the store. iCloud sync is opt-in via Settings (needs the CloudKit
+    /// entitlement + a paid Apple Developer account); if enabling it fails
+    /// (e.g. missing entitlement), we fall back to a local-only store so the app
+    /// still launches.
     static func makeContainer() -> ModelContainer {
         let schema = Schema([
             WorkoutTemplate.self, Exercise.self,
@@ -29,9 +30,18 @@ struct ReelFitApp: App {
             NutritionTarget.self, Meal.self, FoodEntry.self,
             BodyMetric.self, WaterLog.self, Supplement.self, SupplementLog.self,
         ])
-        let config = ModelConfiguration(schema: schema, cloudKitDatabase: .none)
+
+        if AppConfig.iCloudSyncEnabled {
+            let cloud = ModelConfiguration(schema: schema, cloudKitDatabase: .automatic)
+            if let container = try? ModelContainer(for: schema, configurations: [cloud]) {
+                return container
+            }
+            // Fall through to local-only on failure.
+        }
+
+        let local = ModelConfiguration(schema: schema, cloudKitDatabase: .none)
         do {
-            return try ModelContainer(for: schema, configurations: [config])
+            return try ModelContainer(for: schema, configurations: [local])
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
