@@ -41,6 +41,15 @@ struct TodayView: View {
                     statRow(icon: "shoeprints.fill", title: "Steps", value: "\(health.todaySteps)", unit: "")
                 } header: { sectionTitle("Today") }
 
+                Section {
+                    WorkoutHeatmap(weeks: 53, cell: 11)
+                        .padding(.vertical, 2)
+                } header: {
+                    sectionTitle("Your year")
+                } footer: {
+                    HeatmapLegend()
+                }
+
                 if !todaySessions.isEmpty || !todayRuns.isEmpty {
                     Section {
                         ForEach(todaySessions) { s in
