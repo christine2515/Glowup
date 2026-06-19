@@ -4,6 +4,7 @@ import SwiftData
 struct WorkoutsView: View {
     @Environment(PendingReels.self) private var pending
     @Environment(\.modelContext) private var context
+    @State private var config = AppConfig.shared
     @Query(sort: \WorkoutTemplate.createdAt, order: .reverse)
     private var workouts: [WorkoutTemplate]
 
@@ -52,6 +53,7 @@ struct WorkoutsView: View {
                 }
             }
             .navigationTitle("Workouts")
+            .airyBackground(config.theme)
             .toolbar {
                 Button {
                     importing = .manual

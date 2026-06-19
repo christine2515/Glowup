@@ -81,6 +81,33 @@ struct AppTheme: Identifiable, Hashable {
     }
 }
 
+/// A soft, airy gradient wash behind a scrollable screen. Pair with floating
+/// list rows for a light, girly aesthetic.
+struct AiryBackground: ViewModifier {
+    let theme: AppTheme
+    func body(content: Content) -> some View {
+        content
+            .scrollContentBackground(.hidden)
+            .background(
+                LinearGradient(
+                    colors: [
+                        theme.gradient.first?.opacity(0.55) ?? .clear,
+                        (theme.gradient.last ?? .clear).opacity(0.20),
+                        Color(.systemBackground),
+                    ],
+                    startPoint: .top, endPoint: .bottom
+                )
+                .ignoresSafeArea()
+            )
+    }
+}
+
+extension View {
+    func airyBackground(_ theme: AppTheme) -> some View {
+        modifier(AiryBackground(theme: theme))
+    }
+}
+
 extension Color {
     /// Hex like "FF8FB1" or "#FF8FB1".
     init(hex: String) {

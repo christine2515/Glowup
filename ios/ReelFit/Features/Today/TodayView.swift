@@ -1,28 +1,17 @@
 import SwiftUI
 import SwiftData
 
-/// Daily dashboard pulling together training, nutrition, hydration,
-/// supplements, steps, and weight.
+/// Daily, training-focused dashboard: today's activity, this week at a glance,
+/// hydration, and weight.
 struct TodayView: View {
     @State private var config = AppConfig.shared
     @State private var health = HealthKitManager.shared
 
-    @Query(sort: \NutritionTarget.effectiveDate, order: .reverse) private var targets: [NutritionTarget]
-    @Query(sort: \Meal.date, order: .reverse) private var allMeals: [Meal]
     @Query private var waterLogs: [WaterLog]
-    @Query(sort: \Supplement.createdAt) private var supplements: [Supplement]
     @Query(sort: \WorkoutSession.date, order: .reverse) private var sessions: [WorkoutSession]
     @Query(sort: \BodyMetric.date, order: .reverse) private var metrics: [BodyMetric]
     @Query private var runs: [RunEntry]
 
-    private var target: NutritionTarget? { targets.first }
-    private var todayMeals: [Meal] { allMeals.filter { Calendar.current.isDateInToday($0.date) } }
-    private var consumed: MacroTotals {
-        todayMeals.reduce(into: MacroTotals()) {
-            $0.kcal += $1.totalKcal; $0.protein += $1.totalProtein
-            $0.carbs += $1.totalCarbs; $0.fat += $1.totalFat
-        }
-    }
     private var waterToday: Double {
         waterLogs.filter { Calendar.current.isDateInToday($0.date) }.reduce(0) { $0 + $1.amountML }
     }
@@ -33,64 +22,117 @@ struct TodayView: View {
         runs.filter { $0.completed && Calendar.current.isDateInToday($0.date) }
             .sorted { $0.date > $1.date }
     }
-    private var supplementsTaken: Int {
-        supplements.reduce(0) { acc, s in
-            acc + ((s.logs ?? []).contains { Calendar.current.isDateInToday($0.date) } ? 1 : 0)
-        }
+    private var workoutsThisWeek: Int {
+        let cal = Calendar.current
+        guard let week = cal.dateInterval(of: .weekOfYear, for: Date()) else { return 0 }
+        let s = sessions.filter { week.contains($0.date) }.count
+        let r = runs.filter { $0.completed && week.contains($0.date) }.count
+        return s + r
     }
 
     var body: some View {
         NavigationStack {
             List {
-                Section("Nutrition") {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 20) {
-                            MacroRing(label: "Calories", value: consumed.kcal, target: target?.kcal ?? 2000, unit: "kcal", color: config.theme.calories)
-                            MacroRing(label: "Protein", value: consumed.protein, target: target?.proteinG ?? 150, unit: "g", color: config.theme.protein)
-                            MacroRing(label: "Carbs", value: consumed.carbs, target: target?.carbsG ?? 200, unit: "g", color: config.theme.carbs)
-                            MacroRing(label: "Fat", value: consumed.fat, target: target?.fatG ?? 60, unit: "g", color: config.theme.fat)
-                        }
-                        .padding(.vertical, 4)
-                    }
-                }
-                .listRowBackground(config.theme.wash)
+                heroHeader
 
-                Section("Activity") {
-                    LabeledContent("Steps", value: "\(health.todaySteps)")
-                    LabeledContent("Workouts logged", value: "\(todaySessions.count)")
-                    ForEach(todaySessions) { s in
-                        LabeledContent(s.templateTitle.isEmpty ? "Workout" : s.templateTitle,
-                                       value: s.date.formatted(date: .omitted, time: .shortened))
-                    }
-                    ForEach(todayRuns) { run in
-                        LabeledContent {
-                            Text("\(run.actualDistanceKm ?? 0, specifier: "%.1f") km")
-                        } label: {
-                            Label(run.name.isEmpty ? "Run" : run.name,
-                                  systemImage: "figure.run")
+                Section {
+                    statRow(icon: "flame.fill", title: "This week",
+                            value: "\(workoutsThisWeek)", unit: "workouts")
+                    statRow(icon: "shoeprints.fill", title: "Steps", value: "\(health.todaySteps)", unit: "")
+                } header: { sectionTitle("Today") }
+
+                if !todaySessions.isEmpty || !todayRuns.isEmpty {
+                    Section {
+                        ForEach(todaySessions) { s in
+                            Label(s.templateTitle.isEmpty ? "Workout" : s.templateTitle,
+                                  systemImage: "dumbbell.fill")
                         }
-                    }
+                        ForEach(todayRuns) { run in
+                            Label {
+                                Text("\(run.name.isEmpty ? "Run" : run.name) · \(run.actualDistanceKm ?? 0, specifier: "%.1f") km")
+                            } icon: {
+                                Image(systemName: "figure.run")
+                            }
+                        }
+                    } header: { sectionTitle("Logged today") }
                 }
 
-                Section("Habits") {
-                    ProgressView(value: min(waterToday / max(config.waterGoalML, 1), 1)) {
-                        Text("Water · \(Int(waterToday))/\(Int(config.waterGoalML)) ml").font(.subheadline)
+                Section {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Label("Water", systemImage: "drop.fill")
+                            Spacer()
+                            Text("\(Int(waterToday)) / \(Int(config.waterGoalML)) ml")
+                                .font(.subheadline).foregroundStyle(.secondary)
+                        }
+                        ProgressView(value: min(waterToday / max(config.waterGoalML, 1), 1))
+                            .tint(config.theme.accent)
                     }
-                    if !supplements.isEmpty {
-                        LabeledContent("Supplements", value: "\(supplementsTaken)/\(supplements.count) taken")
-                    }
+                    .padding(.vertical, 2)
+
                     if let latest = metrics.first {
-                        LabeledContent("Weight",
-                                       value: WeightFormat.display(latest.weightKg, metric: config.useMetric))
+                        HStack {
+                            Label("Weight", systemImage: "scalemass.fill")
+                            Spacer()
+                            Text(WeightFormat.display(latest.weightKg, metric: config.useMetric))
+                                .foregroundStyle(.secondary)
+                        }
                     }
-                }
+                } header: { sectionTitle("Habits") }
             }
-            .navigationTitle(Date().formatted(date: .complete, time: .omitted))
+            .listStyle(.insetGrouped)
+            .scrollContentBackground(.hidden)
+            .airyBackground(config.theme)
+            .navigationTitle("")
+            .toolbar(.hidden, for: .navigationBar)
             .refreshable {
                 if health.authorized { await health.refreshTodaySteps() }
             }
             .task {
                 if health.authorized { await health.refreshTodaySteps() }
+            }
+        }
+    }
+
+    // MARK: - Pieces
+
+    private var heroHeader: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(greeting)
+                .font(.largeTitle.bold())
+            Text(Date().formatted(.dateTime.weekday(.wide).month(.wide).day()))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 8)
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
+    }
+
+    private var greeting: String {
+        switch Calendar.current.component(.hour, from: Date()) {
+        case 5..<12: "Good morning ☀️"
+        case 12..<17: "Good afternoon 🌸"
+        case 17..<22: "Good evening 🌙"
+        default: "Hey 💪"
+        }
+    }
+
+    private func sectionTitle(_ text: String) -> some View {
+        Text(text)
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(config.theme.accent)
+            .textCase(nil)
+    }
+
+    private func statRow(icon: String, title: String, value: String, unit: String) -> some View {
+        HStack {
+            Label(title, systemImage: icon)
+            Spacer()
+            Text(value).font(.title3.bold()).monospacedDigit()
+            if !unit.isEmpty {
+                Text(unit).font(.caption).foregroundStyle(.secondary)
             }
         }
     }

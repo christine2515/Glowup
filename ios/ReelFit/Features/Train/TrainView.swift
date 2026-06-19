@@ -7,6 +7,7 @@ struct TrainView: View {
     @Query(sort: \WorkoutSession.date, order: .reverse)
     private var sessions: [WorkoutSession]
 
+    @State private var config = AppConfig.shared
     @State private var loggingSession = false
 
     var body: some View {
@@ -51,6 +52,7 @@ struct TrainView: View {
                 }
             }
             .navigationTitle("Train")
+            .airyBackground(config.theme)
             .sheet(isPresented: $loggingSession) {
                 LogSessionView()
             }

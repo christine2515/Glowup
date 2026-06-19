@@ -26,31 +26,3 @@ final class WaterLog {
         self.amountML = amountML
     }
 }
-
-/// A supplement the user wants to take, with a simple daily target count.
-@Model
-final class Supplement {
-    var name: String = ""
-    var dose: String = ""
-    var dailyTarget: Int = 1
-    var createdAt: Date = Date()
-
-    @Relationship(deleteRule: .cascade, inverse: \SupplementLog.supplement)
-    var logs: [SupplementLog]? = []
-
-    init(name: String = "", dose: String = "", dailyTarget: Int = 1) {
-        self.name = name
-        self.dose = dose
-        self.dailyTarget = dailyTarget
-    }
-}
-
-@Model
-final class SupplementLog {
-    var date: Date = Date()
-    var supplement: Supplement?
-
-    init(date: Date = Date()) {
-        self.date = date
-    }
-}

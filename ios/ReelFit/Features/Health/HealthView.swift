@@ -1,14 +1,13 @@
 import SwiftUI
 import SwiftData
 
-/// "Me" tab: Apple Health steps, water, supplements, body weight, and settings.
+/// "Me" tab: Apple Health steps, water, body weight, and settings.
 struct HealthView: View {
     @Environment(\.modelContext) private var context
     @State private var config = AppConfig.shared
     @State private var health = HealthKitManager.shared
 
     @Query private var waterLogs: [WaterLog]
-    @Query(sort: \Supplement.createdAt) private var supplements: [Supplement]
     @Query(sort: \BodyMetric.date, order: .reverse) private var metrics: [BodyMetric]
 
     private var waterToday: Double {
@@ -33,7 +32,6 @@ struct HealthView: View {
                 }
 
                 waterSection
-                supplementsSection
                 weightSection
 
                 Section {
@@ -45,6 +43,7 @@ struct HealthView: View {
                 }
             }
             .navigationTitle("Me")
+            .airyBackground(config.theme)
             .task {
                 if health.authorized { await health.refreshTodaySteps() }
             }
@@ -84,24 +83,6 @@ struct HealthView: View {
         if let last = todays.last { context.delete(last) }
     }
 
-    // MARK: - Supplements
-
-    private var supplementsSection: some View {
-        Section("Supplements") {
-            if supplements.isEmpty {
-                Text("Add supplements to track them daily.").foregroundStyle(.secondary)
-            }
-            ForEach(supplements) { supp in
-                SupplementRow(supplement: supp)
-            }
-            NavigationLink {
-                SupplementsManageView()
-            } label: {
-                Label("Manage supplements", systemImage: "pills")
-            }
-        }
-    }
-
     // MARK: - Weight
 
     private var weightSection: some View {
@@ -115,40 +96,6 @@ struct HealthView: View {
             } label: {
                 Label("Log & trend", systemImage: "scalemass")
             }
-        }
-    }
-}
-
-/// A supplement row with a per-day count toward its target.
-struct SupplementRow: View {
-    @Bindable var supplement: Supplement
-    @Environment(\.modelContext) private var context
-
-    private var todayCount: Int {
-        (supplement.logs ?? []).filter { Calendar.current.isDateInToday($0.date) }.count
-    }
-
-    var body: some View {
-        HStack {
-            VStack(alignment: .leading) {
-                Text(supplement.name)
-                if !supplement.dose.isEmpty {
-                    Text(supplement.dose).font(.caption).foregroundStyle(.secondary)
-                }
-            }
-            Spacer()
-            Text("\(todayCount)/\(supplement.dailyTarget)")
-                .monospacedDigit()
-                .foregroundStyle(todayCount >= supplement.dailyTarget ? .green : .secondary)
-            Button {
-                let log = SupplementLog(date: Date())
-                log.supplement = supplement
-                context.insert(log)
-            } label: {
-                Image(systemName: "plus.circle.fill")
-            }
-            .buttonStyle(.plain)
-            .disabled(todayCount >= supplement.dailyTarget)
         }
     }
 }

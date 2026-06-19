@@ -23,34 +23,6 @@ struct ExtractedWorkout: Codable {
     var needsManualCaption: Bool
 }
 
-struct MacroBudget: Codable {
-    var kcal: Double
-    var proteinG: Double
-    var carbsG: Double
-    var fatG: Double
-}
-
-struct MealSuggestion: Codable, Identifiable {
-    var id: String { name }
-    var name: String
-    var description: String
-    var kcal: Double
-    var proteinG: Double
-    var carbsG: Double
-    var fatG: Double
-    var ingredients: [String]
-}
-
-struct FoodResult: Codable, Identifiable {
-    var id: String { name + serving }
-    var name: String
-    var serving: String
-    var kcal: Double
-    var proteinG: Double
-    var carbsG: Double
-    var fatG: Double
-}
-
 struct StravaConfig: Codable {
     var clientId: String
     var configured: Bool
@@ -88,29 +60,6 @@ struct BackendClient {
     func extractReel(url: String, caption: String? = nil) async throws -> ExtractedWorkout {
         struct Body: Codable { let url: String; let caption: String? }
         return try await post("/reels/extract", body: Body(url: url, caption: caption))
-    }
-
-    func recommendMeals(
-        remaining: MacroBudget, mealType: String, preferences: String
-    ) async throws -> [MealSuggestion] {
-        struct Body: Codable {
-            let remaining: MacroBudget
-            let mealType: String
-            let preferences: String
-        }
-        struct Response: Codable { let suggestions: [MealSuggestion] }
-        let r: Response = try await post(
-            "/nutrition/recommend",
-            body: Body(remaining: remaining, mealType: mealType, preferences: preferences)
-        )
-        return r.suggestions
-    }
-
-    func searchFood(_ query: String) async throws -> [FoodResult] {
-        struct Response: Codable { let items: [FoodResult] }
-        let q = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let r: Response = try await get("/nutrition/search?q=\(q)")
-        return r.items
     }
 
     // MARK: - Strava token operations (client secret stays on the backend)

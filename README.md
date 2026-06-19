@@ -1,9 +1,14 @@
 # ReelFit
 
-Capture workouts from Instagram reels and organize your whole fitness life:
-reel-import → AI-structured workouts → categorized library → daily training log,
-run planning, rep progress, nutrition/macros with AI meal suggestions, water,
-supplements, body weight, and Apple Health steps.
+Capture workouts from Instagram reels and organize your training: reel-import →
+AI-structured workouts → categorized library → daily training log, run planning
+(incl. Strava import), rep/strength progress, a workout calendar, plus water,
+body weight, and Apple Health steps. Designed to be light and airy with
+selectable color themes.
+
+> Focused on training. The Nutrition tab and supplement tracking were removed;
+> the backend still exposes `/nutrition/*` endpoints but the app no longer
+> calls them.
 
 This is a monorepo:
 
@@ -20,11 +25,11 @@ See the phase tracker / `ios` source for what's stubbed vs. live.
 |---|---|
 | Reel import → AI workout (caption or audio transcript) → editable, categorized library | ✅ working |
 | Daily training log (pick a saved workout, edit sets) | ✅ working |
-| Run planner, progress charts | ✅ working |
+| Run planner, progress charts, workout calendar heatmap | ✅ working |
 | Strava import (Coros → Strava → ReelFit runs) | ✅ working |
-| Nutrition: macro rings, meal log, food search, AI meal ideas | ✅ working |
-| Water, supplements, weight trend, steps | ✅ working |
-| Today dashboard (rings, steps, water, supplements, weight) | ✅ working |
+| Water + body-weight trend + Apple Health steps | ✅ working |
+| Today dashboard (this-week, steps, water, weight) | ✅ working |
+| Color themes + airy design | ✅ working |
 | iCloud sync | ✅ toggle in Settings (needs paid Apple account + CloudKit capability) |
 
 ## 1. Run the backend

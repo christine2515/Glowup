@@ -27,8 +27,7 @@ struct ReelFitApp: App {
         let schema = Schema([
             WorkoutTemplate.self, Exercise.self,
             WorkoutSession.self, SetLog.self, RunEntry.self,
-            NutritionTarget.self, Meal.self, FoodEntry.self,
-            BodyMetric.self, WaterLog.self, Supplement.self, SupplementLog.self,
+            BodyMetric.self, WaterLog.self,
         ])
 
         if AppConfig.iCloudSyncEnabled {

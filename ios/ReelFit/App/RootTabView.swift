@@ -22,9 +22,6 @@ struct RootTabView: View {
             TrainView()
                 .tabItem { Label("Train", systemImage: "figure.run") }
 
-            NutritionView()
-                .tabItem { Label("Nutrition", systemImage: "fork.knife") }
-
             HealthView()
                 .tabItem { Label("Me", systemImage: "heart") }
         }
