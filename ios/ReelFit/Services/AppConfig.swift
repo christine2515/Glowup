@@ -28,6 +28,12 @@ final class AppConfig {
         didSet { defaults.set(waterGoalML, forKey: "waterGoalML") }
     }
 
+    /// Selected color theme id (see AppTheme.all).
+    var themeID: String {
+        didSet { defaults.set(themeID, forKey: "themeID") }
+    }
+    var theme: AppTheme { AppTheme.by(id: themeID) }
+
     /// Opt into iCloud (CloudKit) sync. Takes effect on next launch and only
     /// works with the CloudKit entitlement + a paid Apple Developer account.
     var useICloudSync: Bool {
@@ -45,6 +51,7 @@ final class AppConfig {
         apiToken = defaults.string(forKey: "apiToken") ?? ""
         useMetric = defaults.object(forKey: "useMetric") as? Bool ?? true
         waterGoalML = defaults.object(forKey: "waterGoalML") as? Double ?? 2500
+        themeID = defaults.string(forKey: "themeID") ?? AppTheme.lavender.id
         useICloudSync = defaults.bool(forKey: AppConfig.iCloudKey)
     }
 

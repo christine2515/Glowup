@@ -5,6 +5,7 @@ import SwiftData
 /// meal suggestions that fit your remaining macros.
 struct NutritionView: View {
     @Environment(\.modelContext) private var context
+    @State private var config = AppConfig.shared
 
     @Query(sort: \NutritionTarget.effectiveDate, order: .reverse)
     private var targets: [NutritionTarget]
@@ -71,13 +72,13 @@ struct NutritionView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 20) {
                     MacroRing(label: "Calories", value: consumed.kcal,
-                              target: t?.kcal ?? 2000, unit: "kcal", color: .orange)
+                              target: t?.kcal ?? 2000, unit: "kcal", color: config.theme.calories)
                     MacroRing(label: "Protein", value: consumed.protein,
-                              target: t?.proteinG ?? 150, unit: "g", color: .pink)
+                              target: t?.proteinG ?? 150, unit: "g", color: config.theme.protein)
                     MacroRing(label: "Carbs", value: consumed.carbs,
-                              target: t?.carbsG ?? 200, unit: "g", color: .blue)
+                              target: t?.carbsG ?? 200, unit: "g", color: config.theme.carbs)
                     MacroRing(label: "Fat", value: consumed.fat,
-                              target: t?.fatG ?? 60, unit: "g", color: .green)
+                              target: t?.fatG ?? 60, unit: "g", color: config.theme.fat)
                 }
                 .padding(.vertical, 4)
             }
@@ -86,6 +87,7 @@ struct NutritionView: View {
                     .font(.caption).foregroundStyle(.secondary)
             }
         }
+        .listRowBackground(config.theme.wash)
     }
 
     private var actionsSection: some View {

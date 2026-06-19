@@ -2,8 +2,15 @@ import SwiftUI
 
 struct RootTabView: View {
     @Environment(PendingReels.self) private var pending
+    @State private var config = AppConfig.shared
 
     var body: some View {
+        content
+            .tint(config.theme.accent)
+            .fontDesign(.rounded)
+    }
+
+    private var content: some View {
         TabView {
             TodayView()
                 .tabItem { Label("Today", systemImage: "sun.max") }

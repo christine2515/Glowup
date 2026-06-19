@@ -45,14 +45,15 @@ struct TodayView: View {
                 Section("Nutrition") {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 20) {
-                            MacroRing(label: "Calories", value: consumed.kcal, target: target?.kcal ?? 2000, unit: "kcal", color: .orange)
-                            MacroRing(label: "Protein", value: consumed.protein, target: target?.proteinG ?? 150, unit: "g", color: .pink)
-                            MacroRing(label: "Carbs", value: consumed.carbs, target: target?.carbsG ?? 200, unit: "g", color: .blue)
-                            MacroRing(label: "Fat", value: consumed.fat, target: target?.fatG ?? 60, unit: "g", color: .green)
+                            MacroRing(label: "Calories", value: consumed.kcal, target: target?.kcal ?? 2000, unit: "kcal", color: config.theme.calories)
+                            MacroRing(label: "Protein", value: consumed.protein, target: target?.proteinG ?? 150, unit: "g", color: config.theme.protein)
+                            MacroRing(label: "Carbs", value: consumed.carbs, target: target?.carbsG ?? 200, unit: "g", color: config.theme.carbs)
+                            MacroRing(label: "Fat", value: consumed.fat, target: target?.fatG ?? 60, unit: "g", color: config.theme.fat)
                         }
                         .padding(.vertical, 4)
                     }
                 }
+                .listRowBackground(config.theme.wash)
 
                 Section("Activity") {
                     LabeledContent("Steps", value: "\(health.todaySteps)")

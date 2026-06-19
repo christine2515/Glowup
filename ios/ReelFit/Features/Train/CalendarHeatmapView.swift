@@ -6,6 +6,7 @@ import SwiftData
 struct CalendarHeatmapView: View {
     @Query private var sessions: [WorkoutSession]
     @Query private var runs: [RunEntry]
+    @State private var config = AppConfig.shared
 
     /// How many weeks back to show.
     private let weeks = 26
@@ -106,9 +107,9 @@ struct CalendarHeatmapView: View {
     private func color(for count: Int) -> Color {
         switch count {
         case 0: return Color.gray.opacity(0.15)
-        case 1: return Color.green.opacity(0.45)
-        case 2: return Color.green.opacity(0.7)
-        default: return Color.green
+        case 1: return config.theme.heat.opacity(0.4)
+        case 2: return config.theme.heat.opacity(0.7)
+        default: return config.theme.heat
         }
     }
 }
