@@ -5,7 +5,7 @@
 	<key>CFBundleDisplayName</key>
 	<string>Save to Glowup</string>
 	<key>CFBundleName</key>
-	<string>ReelFitShareExtension</string>
+	<string>GlowupShareExtension</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

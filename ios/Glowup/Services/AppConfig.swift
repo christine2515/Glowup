@@ -8,12 +8,12 @@ final class AppConfig {
 
     private let defaults = UserDefaults.standard
 
-    /// Base URL of the ReelFit backend, e.g. "http://192.168.1.20:8000".
+    /// Base URL of the Glowup backend, e.g. "http://192.168.1.20:8000".
     var backendURL: String {
         didSet { defaults.set(backendURL, forKey: "backendURL") }
     }
 
-    /// Optional shared secret matching REELFIT_API_TOKEN on the backend.
+    /// Optional shared secret matching GLOWUP_API_TOKEN on the backend.
     var apiToken: String {
         didSet { defaults.set(apiToken, forKey: "apiToken") }
     }

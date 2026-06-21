@@ -47,8 +47,8 @@ final class StravaService: NSObject, ASWebAuthenticationPresentationContextProvi
     static let shared = StravaService()
 
     /// Must match your Strava app's "Authorization Callback Domain".
-    private let callbackScheme = "reelfit"
-    private let callbackDomain = "reelfit.app"
+    private let callbackScheme = "glowup"
+    private let callbackDomain = "glowup.app"
     private let tokenKey = "strava.tokens"
 
     private let client = BackendClient()

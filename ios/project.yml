@@ -1,6 +1,6 @@
-name: ReelFit
+name: Glowup
 options:
-  bundleIdPrefix: com.reelfit
+  bundleIdPrefix: com.glowup
   deploymentTarget:
     iOS: "17.0"
   createIntermediateGroups: true
@@ -16,30 +16,30 @@ settings:
     CODE_SIGN_STYLE: Automatic
 
 targets:
-  ReelFit:
+  Glowup:
     type: application
     platform: iOS
     sources:
-      - path: ReelFit
+      - path: Glowup
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.reelfit.app
-        INFOPLIST_FILE: ReelFit/Info.plist
-        CODE_SIGN_ENTITLEMENTS: ReelFit/ReelFit.entitlements
+        PRODUCT_BUNDLE_IDENTIFIER: com.glowup.app
+        INFOPLIST_FILE: Glowup/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Glowup/Glowup.entitlements
         GENERATE_INFOPLIST_FILE: NO
     dependencies:
-      - target: ReelFitShareExtension
+      - target: GlowupShareExtension
         embed: true
 
-  ReelFitShareExtension:
+  GlowupShareExtension:
     type: app-extension
     platform: iOS
     sources:
-      - path: ReelFitShareExtension
-      - path: ReelFit/Shared
+      - path: GlowupShareExtension
+      - path: Glowup/Shared
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.reelfit.app.share
-        INFOPLIST_FILE: ReelFitShareExtension/Info.plist
-        CODE_SIGN_ENTITLEMENTS: ReelFitShareExtension/ShareExtension.entitlements
+        PRODUCT_BUNDLE_IDENTIFIER: com.glowup.app.share
+        INFOPLIST_FILE: GlowupShareExtension/Info.plist
+        CODE_SIGN_ENTITLEMENTS: GlowupShareExtension/ShareExtension.entitlements
         GENERATE_INFOPLIST_FILE: NO

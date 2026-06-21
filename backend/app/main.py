@@ -1,4 +1,4 @@
-"""ReelFit backend API.
+"""Glowup backend API.
 
 Run locally:
     cd backend
@@ -32,11 +32,11 @@ from .schemas import (
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
-app = FastAPI(title="ReelFit API", version="0.1.0")
+app = FastAPI(title="Glowup API", version="0.1.0")
 
 
 def _check_token(token: str | None) -> None:
-    expected = os.environ.get("REELFIT_API_TOKEN", "")
+    expected = os.environ.get("GLOWUP_API_TOKEN", "")
     if expected and token != expected:
         raise HTTPException(status_code=401, detail="Invalid token")
 
@@ -49,9 +49,9 @@ def health() -> dict:
 @app.post("/reels/extract", response_model=ExtractResponse)
 def extract_reel(
     req: ExtractRequest,
-    x_reelfit_token: str | None = Header(default=None),
+    x_glowup_token: str | None = Header(default=None),
 ) -> ExtractResponse:
-    _check_token(x_reelfit_token)
+    _check_token(x_glowup_token)
 
     caption = req.caption
     thumbnail = None
@@ -96,9 +96,9 @@ def extract_reel(
 @app.post("/nutrition/recommend", response_model=RecommendResponse)
 def recommend(
     req: RecommendRequest,
-    x_reelfit_token: str | None = Header(default=None),
+    x_glowup_token: str | None = Header(default=None),
 ) -> RecommendResponse:
-    _check_token(x_reelfit_token)
+    _check_token(x_glowup_token)
     suggestions = ai.recommend_meals(req.remaining, req.meal_type, req.preferences)
     return RecommendResponse(suggestions=suggestions)
 
@@ -106,9 +106,9 @@ def recommend(
 @app.get("/nutrition/search", response_model=FoodSearchResponse)
 def food_search(
     q: str,
-    x_reelfit_token: str | None = Header(default=None),
+    x_glowup_token: str | None = Header(default=None),
 ) -> FoodSearchResponse:
-    _check_token(x_reelfit_token)
+    _check_token(x_glowup_token)
     return FoodSearchResponse(items=nutrition.search_foods(q))
 
 
@@ -134,22 +134,22 @@ class StravaTokens(BaseModel):
 
 
 @app.get("/strava/config", response_model=StravaConfig)
-def strava_config(x_reelfit_token: str | None = Header(default=None)) -> StravaConfig:
-    _check_token(x_reelfit_token)
+def strava_config(x_glowup_token: str | None = Header(default=None)) -> StravaConfig:
+    _check_token(x_glowup_token)
     return StravaConfig(clientId=strava.client_id(), configured=strava.is_configured())
 
 
 @app.post("/strava/exchange", response_model=StravaTokens)
 def strava_exchange(
-    body: StravaCodeBody, x_reelfit_token: str | None = Header(default=None)
+    body: StravaCodeBody, x_glowup_token: str | None = Header(default=None)
 ) -> StravaTokens:
-    _check_token(x_reelfit_token)
+    _check_token(x_glowup_token)
     return StravaTokens(**strava.exchange_code(body.code))
 
 
 @app.post("/strava/refresh", response_model=StravaTokens)
 def strava_refresh(
-    body: StravaRefreshBody, x_reelfit_token: str | None = Header(default=None)
+    body: StravaRefreshBody, x_glowup_token: str | None = Header(default=None)
 ) -> StravaTokens:
-    _check_token(x_reelfit_token)
+    _check_token(x_glowup_token)
     return StravaTokens(**strava.refresh(body.refreshToken))

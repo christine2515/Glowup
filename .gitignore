@@ -6,7 +6,7 @@ backend/.env
 .pytest_cache/
 
 # Xcode / generated project
-ios/ReelFit.xcodeproj/
+ios/Glowup.xcodeproj/
 ios/build/
 ios/DerivedData/
 *.xcuserstate

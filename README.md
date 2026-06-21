@@ -6,10 +6,6 @@ AI-structured workouts → categorized library → daily training log, run plann
 body weight, and Apple Health steps. Designed to be light and airy with
 selectable color themes.
 
-> The app's display name is **Glowup**. Internal identifiers and folders still
-> use the original `ReelFit` name (Xcode project, bundle id `com.reelfit.app`,
-> app group, repo dir) so the build, paths, and commands below are unchanged.
-
 > Focused on training. The Nutrition tab and supplement tracking were removed;
 > the backend still exposes `/nutrition/*` endpoints but the app no longer
 > calls them.
@@ -30,7 +26,7 @@ See the phase tracker / `ios` source for what's stubbed vs. live.
 | Reel import → AI workout (caption or audio transcript) → editable, categorized library | ✅ working |
 | Daily training log (pick a saved workout, edit sets) | ✅ working |
 | Run planner, progress charts, workout calendar heatmap | ✅ working |
-| Strava import (Coros → Strava → ReelFit runs) | ✅ working |
+| Strava import (Coros → Strava → Glowup runs) | ✅ working |
 | Water + body-weight trend + Apple Health steps | ✅ working |
 | Today dashboard (this-week, steps, water, weight) | ✅ working |
 | Color themes + airy design | ✅ working |
@@ -63,7 +59,7 @@ The project is defined with **XcodeGen** (no committed `.xcodeproj`).
 brew install xcodegen
 cd ios
 xcodegen generate
-open ReelFit.xcodeproj
+open Glowup.xcodeproj
 ```
 
 In Xcode:
@@ -80,17 +76,17 @@ In Xcode:
 
 ## 3. Use it
 
-- In Instagram, share a reel → **Save to ReelFit**. Open ReelFit → the reel
+- In Instagram, share a reel → **Save to Glowup**. Open Glowup → the reel
   appears under **Workouts → Shared from Instagram** → tap to import.
 - Or tap **+** in Workouts and paste a reel link.
 - If a reel can't be read automatically, the app asks you to paste the caption.
 
 ## Connect Strava (for your Coros runs)
 
-Your Coros runs auto-export to Strava; ReelFit imports them from there.
+Your Coros runs auto-export to Strava; Glowup imports them from there.
 
 1. Create a free API app at <https://www.strava.com/settings/api>.
-   - Set **Authorization Callback Domain** to exactly: `reelfit.app`
+   - Set **Authorization Callback Domain** to exactly: `glowup.app`
    - Note the **Client ID** and **Client Secret**.
 2. In `backend/.env` set `STRAVA_CLIENT_ID` and `STRAVA_CLIENT_SECRET`, restart
    the backend.
@@ -106,10 +102,10 @@ access/refresh tokens (in the Keychain).
 Off by default (local-only). To turn on cross-device sync:
 
 1. Join the **paid Apple Developer Program**.
-2. In Xcode, select the **ReelFit** target → **Signing & Capabilities** →
+2. In Xcode, select the **Glowup** target → **Signing & Capabilities** →
    **+ Capability** → **iCloud** → check **CloudKit** and add a container
-   (e.g. `iCloud.com.reelfit.app`). XcodeGen will keep this if you also add the
-   matching keys to `ios/ReelFit/ReelFit.entitlements`.
+   (e.g. `iCloud.com.glowup.app`). XcodeGen will keep this if you also add the
+   matching keys to `ios/Glowup/Glowup.entitlements`.
 3. In the app: **Me → Settings → iCloud sync** ON, then relaunch.
 
 The model layer is already CloudKit-compatible (optional relationships,

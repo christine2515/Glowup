@@ -17,7 +17,7 @@ import os
 import httpx
 from fastapi import HTTPException
 
-log = logging.getLogger("reelfit.strava")
+log = logging.getLogger("glowup.strava")
 
 _TOKEN_URL = "https://www.strava.com/oauth/token"
 

@@ -20,9 +20,9 @@ from .schemas import (
     MealSuggestion,
 )
 
-log = logging.getLogger("reelfit.ai")
+log = logging.getLogger("glowup.ai")
 
-MODEL = os.environ.get("REELFIT_MODEL", "claude-sonnet-4-6")
+MODEL = os.environ.get("GLOWUP_MODEL", "claude-sonnet-4-6")
 
 
 def _client():

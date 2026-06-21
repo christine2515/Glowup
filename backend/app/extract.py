@@ -11,7 +11,7 @@ import logging
 from dataclasses import dataclass
 from typing import Optional
 
-log = logging.getLogger("reelfit.extract")
+log = logging.getLogger("glowup.extract")
 
 
 @dataclass
@@ -65,7 +65,7 @@ def download_audio(url: str) -> Optional[str]:
     import os
     import tempfile
 
-    tmpdir = tempfile.mkdtemp(prefix="reelfit_")
+    tmpdir = tempfile.mkdtemp(prefix="glowup_")
     outtmpl = os.path.join(tmpdir, "audio.%(ext)s")
     opts = {
         "quiet": True,

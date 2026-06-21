@@ -5,7 +5,7 @@ import Foundation
 /// extension target.
 enum AppGroup {
     /// Must match the App Group capability in both targets' entitlements.
-    static let identifier = "group.com.reelfit.shared"
+    static let identifier = "group.com.glowup.shared"
 
     static var defaults: UserDefaults? {
         UserDefaults(suiteName: identifier)

@@ -1,4 +1,4 @@
-# Glowup (internally "ReelFit") — Known Limitations & Caveats
+# Glowup — Known Limitations & Caveats
 
 Last updated: 2026-06-18. Keep this in mind when using or extending the app.
 
@@ -42,11 +42,11 @@ Last updated: 2026-06-18. Keep this in mind when using or extending the app.
 - **AI meal suggestions** are estimates, not precise nutrition facts.
 
 ## Runs / wearables
-- **Strava import is built.** Your Coros runs auto-export to Strava; ReelFit
+- **Strava import is built.** Your Coros runs auto-export to Strava; Glowup
   connects to Strava (OAuth) and imports runs into the Train tab alongside gym
   workouts. Caveats:
   - Requires a **Strava API app** (free) with **Authorization Callback Domain =
-    `reelfit.app`**, and `STRAVA_CLIENT_ID`/`STRAVA_CLIENT_SECRET` in the backend
+    `glowup.app`**, and `STRAVA_CLIENT_ID`/`STRAVA_CLIENT_SECRET` in the backend
     `.env`.
   - Each sync pulls your **most recent 50 activities** and adds new runs (deduped
     by Strava activity id). Older history isn't back-filled yet; pagination can be

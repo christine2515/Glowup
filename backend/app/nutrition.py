@@ -13,7 +13,7 @@ import httpx
 
 from .schemas import FoodItemOut
 
-log = logging.getLogger("reelfit.nutrition")
+log = logging.getLogger("glowup.nutrition")
 
 _SEARCH_URL = "https://api.nal.usda.gov/fdc/v1/foods/search"
 

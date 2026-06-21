@@ -15,13 +15,13 @@ import os
 import shutil
 from typing import Optional
 
-log = logging.getLogger("reelfit.transcribe")
+log = logging.getLogger("glowup.transcribe")
 
 _model = None  # cached WhisperModel
 
 
 def _enabled() -> bool:
-    return os.environ.get("REELFIT_ENABLE_TRANSCRIPTION", "1").lower() in ("1", "true", "yes")
+    return os.environ.get("GLOWUP_ENABLE_TRANSCRIPTION", "1").lower() in ("1", "true", "yes")
 
 
 def _get_model():
@@ -33,7 +33,7 @@ def _get_model():
     except ImportError:
         log.info("faster-whisper not installed; transcription disabled")
         return None
-    size = os.environ.get("REELFIT_WHISPER_MODEL", "base")
+    size = os.environ.get("GLOWUP_WHISPER_MODEL", "base")
     log.info("loading whisper model: %s", size)
     _model = WhisperModel(size, device="cpu", compute_type="int8")
     return _model

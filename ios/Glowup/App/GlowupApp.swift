@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 @main
-struct ReelFitApp: App {
+struct GlowupApp: App {
     let container: ModelContainer
     @State private var pending = PendingReels()
 

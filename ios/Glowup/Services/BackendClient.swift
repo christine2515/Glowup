@@ -51,7 +51,7 @@ enum BackendError: LocalizedError {
     }
 }
 
-/// Thin async client for the ReelFit backend.
+/// Thin async client for the Glowup backend.
 struct BackendClient {
     let config: AppConfig
 
@@ -87,7 +87,7 @@ struct BackendClient {
         var req = URLRequest(url: url)
         req.timeoutInterval = 60
         if !config.apiToken.isEmpty {
-            req.setValue(config.apiToken, forHTTPHeaderField: "X-ReelFit-Token")
+            req.setValue(config.apiToken, forHTTPHeaderField: "X-Glowup-Token")
         }
         return req
     }

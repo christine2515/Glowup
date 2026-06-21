@@ -1,5 +1,5 @@
 """Pydantic models shared across the API. These mirror the Swift structs
-the iOS app decodes (see ios/ReelFit/Services/BackendClient.swift)."""
+the iOS app decodes (see ios/Glowup/Services/BackendClient.swift)."""
 
 from __future__ import annotations
 
