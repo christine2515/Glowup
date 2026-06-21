@@ -60,6 +60,7 @@ struct WeightView: View {
         }
         .navigationTitle("Body Weight")
         .navigationBarTitleDisplayMode(.inline)
+        .airyBackground(config.theme)
     }
 
     private func addWeight() {

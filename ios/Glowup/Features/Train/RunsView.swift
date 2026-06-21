@@ -99,6 +99,7 @@ struct RunsView: View {
             }
         }
         .navigationTitle("Runs")
+        .airyBackground(AppConfig.shared.theme)
         .toolbar {
             Button { addingRun = true } label: { Image(systemName: "plus") }
         }

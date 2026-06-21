@@ -50,6 +50,7 @@ struct CalendarHeatmapView: View {
         }
         .navigationTitle("Workout Calendar")
         .navigationBarTitleDisplayMode(.inline)
+        .airyBackground(AppConfig.shared.theme)
     }
 
     private func stat(_ value: String, _ label: String) -> some View {

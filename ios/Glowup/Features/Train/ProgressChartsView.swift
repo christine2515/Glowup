@@ -82,6 +82,7 @@ struct ProgressChartsView: View {
             }
         }
         .navigationTitle("Progress")
+        .airyBackground(AppConfig.shared.theme)
         .onAppear {
             if selectedExercise.isEmpty { selectedExercise = exerciseNames.first ?? "" }
         }
