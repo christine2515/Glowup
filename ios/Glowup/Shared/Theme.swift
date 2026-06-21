@@ -1,110 +1,89 @@
 import SwiftUI
 
-/// A color palette applied across the app. Macro colors stay distinct but
-/// harmonized to each theme for an elegant, cohesive look.
+/// Design tokens for a theme, mirroring the HTML design's CSS variables.
 struct AppTheme: Identifiable, Hashable {
     let id: String
     let name: String
+    let emoji: String
+    let page: Color
+    let surface: Color
+    let surface2: Color
+    let ink: Color
+    let ink2: Color
     let accent: Color
+    let accentDeep: Color
+    let accentSoft: Color
+    let accentSoft2: Color
     let secondary: Color
-    let calories: Color
-    let protein: Color
-    let carbs: Color
-    let fat: Color
-    let heat: Color          // base color for the workout heatmap
-    let gradient: [Color]    // soft header/card wash
+    let secondarySoft: Color
+    let ring: Color
+    let hm: [Color]   // 5 heatmap levels, light → dark
 
-    static let all: [AppTheme] = [classic, lavender, rose, sunset, citrus, mint]
+    static let all: [AppTheme] = [fairy, seaside]
+    static func by(id: String) -> AppTheme { all.first { $0.id == id } ?? fairy }
 
-    static func by(id: String) -> AppTheme {
-        all.first { $0.id == id } ?? lavender
+    /// A small two-color wash for the theme swatch chip.
+    var swatch: LinearGradient {
+        LinearGradient(colors: [accent, secondary], startPoint: .topLeading, endPoint: .bottomTrailing)
     }
 
-    // MARK: Presets
-
-    static let lavender = AppTheme(
-        id: "lavender", name: "Lavender",
-        accent: Color(hex: "8E5BEF"), secondary: Color(hex: "FF8FB1"),
-        calories: Color(hex: "B07BE8"), protein: Color(hex: "FF8FB1"),
-        carbs: Color(hex: "9D8DF1"), fat: Color(hex: "D7A9F2"),
-        heat: Color(hex: "8E5BEF"),
-        gradient: [Color(hex: "EBD9FF"), Color(hex: "FBD0E6")]
+    static let fairy = AppTheme(
+        id: "fairy", name: "Fairy Garden", emoji: "🌿",
+        page: Color(hex: "F4F2EC"), surface: .white, surface2: Color(hex: "F4F2EA"),
+        ink: Color(hex: "36412F"), ink2: Color(hex: "8B9583"),
+        accent: Color(hex: "6E8A66"), accentDeep: Color(hex: "4C5F44"),
+        accentSoft: Color(hex: "CFDCC2"), accentSoft2: Color(hex: "ECF1E5"),
+        secondary: Color(hex: "BFA06A"), secondarySoft: Color(hex: "EFE6D2"),
+        ring: Color(hex: "506446").opacity(0.12),
+        hm: ["E7E9E0", "C7D6BB", "9DB98C", "6E8A66", "3E4F39"].map { Color(hex: $0) }
     )
 
-    static let rose = AppTheme(
-        id: "rose", name: "Rosé",
-        accent: Color(hex: "E84F8B"), secondary: Color(hex: "F7A6C4"),
-        calories: Color(hex: "F2709C"), protein: Color(hex: "E84F8B"),
-        carbs: Color(hex: "F4A6B7"), fat: Color(hex: "D98FB0"),
-        heat: Color(hex: "E84F8B"),
-        gradient: [Color(hex: "FFE0EC"), Color(hex: "FFD3C2")]
+    static let seaside = AppTheme(
+        id: "seaside", name: "Orange Seaside", emoji: "🍊",
+        page: Color(hex: "FBF4EB"), surface: .white, surface2: Color(hex: "FBF2E8"),
+        ink: Color(hex: "4B4036"), ink2: Color(hex: "A7988A"),
+        accent: Color(hex: "ED9442"), accentDeep: Color(hex: "D2731F"),
+        accentSoft: Color(hex: "FBDCBE"), accentSoft2: Color(hex: "FCEEDF"),
+        secondary: Color(hex: "8FBCCD"), secondarySoft: Color(hex: "DDEBF0"),
+        ring: Color(hex: "96785A").opacity(0.13),
+        hm: ["EFE6DC", "F8D9BC", "F4B97E", "ED9442", "DA7321"].map { Color(hex: $0) }
     )
+}
 
-    static let sunset = AppTheme(
-        id: "sunset", name: "Sunset",
-        accent: Color(hex: "FB6F92"), secondary: Color(hex: "FF9E6D"),
-        calories: Color(hex: "FF7B54"), protein: Color(hex: "FB6F92"),
-        carbs: Color(hex: "FFB26B"), fat: Color(hex: "FFCF6B"),
-        heat: Color(hex: "FB6F92"),
-        gradient: [Color(hex: "FFD9C0"), Color(hex: "FFC2D6")]
-    )
+// MARK: - Typography (Marcellus serif headings, Quicksand rounded body)
 
-    static let citrus = AppTheme(
-        id: "citrus", name: "Citrus",
-        accent: Color(hex: "EF7C3B"), secondary: Color(hex: "43AA8B"),
-        calories: Color(hex: "FF8C42"), protein: Color(hex: "43AA8B"),
-        carbs: Color(hex: "90BE6D"), fat: Color(hex: "F9C74F"),
-        heat: Color(hex: "43AA8B"),
-        gradient: [Color(hex: "FFE2C0"), Color(hex: "CFE9C8")]
-    )
-
-    static let mint = AppTheme(
-        id: "mint", name: "Mint",
-        accent: Color(hex: "2BB6A3"), secondary: Color(hex: "8ED6C4"),
-        calories: Color(hex: "2BB6A3"), protein: Color(hex: "3DA5D9"),
-        carbs: Color(hex: "73C2A0"), fat: Color(hex: "9AD0C2"),
-        heat: Color(hex: "2BB6A3"),
-        gradient: [Color(hex: "D2F2EA"), Color(hex: "CFE9F1")]
-    )
-
-    static let classic = AppTheme(
-        id: "classic", name: "Classic",
-        accent: Color.blue, secondary: Color.pink,
-        calories: .orange, protein: .pink, carbs: .blue, fat: .green,
-        heat: .green,
-        gradient: [Color(hex: "E7F0FF"), Color(hex: "EAF7EE")]
-    )
-
-    /// A soft top-to-bottom wash for headers/cards.
-    var wash: LinearGradient {
-        LinearGradient(colors: gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
+extension Font {
+    /// Marcellus serif — for titles, numbers, hero text.
+    static func serif(_ size: CGFloat) -> Font { .custom("Marcellus", size: size) }
+    /// Quicksand — body / labels.
+    static func sans(_ size: CGFloat, _ weight: Font.Weight = .medium) -> Font {
+        .custom("Quicksand", size: size).weight(weight)
     }
 }
 
-/// A soft, airy gradient wash behind a scrollable screen. Pair with floating
-/// list rows for a light, girly aesthetic.
-struct AiryBackground: ViewModifier {
-    let theme: AppTheme
-    func body(content: Content) -> some View {
-        content
-            .scrollContentBackground(.hidden)
-            .background(
-                LinearGradient(
-                    colors: [
-                        theme.gradient.first?.opacity(0.55) ?? .clear,
-                        (theme.gradient.last ?? .clear).opacity(0.20),
-                        Color(.systemBackground),
-                    ],
-                    startPoint: .top, endPoint: .bottom
-                )
-                .ignoresSafeArea()
-            )
-    }
-}
+// MARK: - Reusable styling
 
 extension View {
-    func airyBackground(_ theme: AppTheme) -> some View {
-        modifier(AiryBackground(theme: theme))
+    /// White rounded card with a soft shadow.
+    func glowCard(_ t: AppTheme, padding: CGFloat = 16, radius: CGFloat = 20) -> some View {
+        self
+            .padding(padding)
+            .background(t.surface, in: RoundedRectangle(cornerRadius: radius, style: .continuous))
+            .shadow(color: Color(hex: "46503C").opacity(0.06), radius: 10, x: 0, y: 3)
+    }
+
+    /// Flat cream page background behind a scroll view / list.
+    func airyBackground(_ t: AppTheme) -> some View {
+        self
+            .scrollContentBackground(.hidden)
+            .background(t.page.ignoresSafeArea())
+    }
+
+    /// Uppercase tracked section label (Quicksand 700).
+    func sectionLabel() -> some View {
+        self.font(.sans(12, .bold))
+            .textCase(.uppercase)
+            .kerning(1.0)
     }
 }
 

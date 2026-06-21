@@ -51,7 +51,7 @@ final class AppConfig {
         apiToken = defaults.string(forKey: "apiToken") ?? ""
         useMetric = defaults.object(forKey: "useMetric") as? Bool ?? true
         waterGoalML = defaults.object(forKey: "waterGoalML") as? Double ?? 2500
-        themeID = defaults.string(forKey: "themeID") ?? AppTheme.lavender.id
+        themeID = defaults.string(forKey: "themeID") ?? AppTheme.fairy.id
         useICloudSync = defaults.bool(forKey: AppConfig.iCloudKey)
     }
 

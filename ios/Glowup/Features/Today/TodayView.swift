@@ -1,8 +1,7 @@
 import SwiftUI
 import SwiftData
 
-/// Daily, training-focused dashboard: today's activity, this week at a glance,
-/// hydration, and weight.
+/// Daily, training-focused dashboard styled to the Glowup design.
 struct TodayView: View {
     @State private var config = AppConfig.shared
     @State private var health = HealthKitManager.shared
@@ -12,15 +11,10 @@ struct TodayView: View {
     @Query(sort: \BodyMetric.date, order: .reverse) private var metrics: [BodyMetric]
     @Query private var runs: [RunEntry]
 
+    private var t: AppTheme { config.theme }
+
     private var waterToday: Double {
         waterLogs.filter { Calendar.current.isDateInToday($0.date) }.reduce(0) { $0 + $1.amountML }
-    }
-    private var todaySessions: [WorkoutSession] {
-        sessions.filter { Calendar.current.isDateInToday($0.date) }
-    }
-    private var todayRuns: [RunEntry] {
-        runs.filter { $0.completed && Calendar.current.isDateInToday($0.date) }
-            .sorted { $0.date > $1.date }
     }
     private var workoutsThisWeek: Int {
         let cal = Calendar.current
@@ -29,94 +23,124 @@ struct TodayView: View {
         let r = runs.filter { $0.completed && week.contains($0.date) }.count
         return s + r
     }
+    private var activeDays: Int {
+        let cal = Calendar.current
+        let start = cal.date(byAdding: .day, value: -365, to: cal.startOfDay(for: Date())) ?? .now
+        var days = Set<Date>()
+        for s in sessions where s.date >= start { days.insert(cal.startOfDay(for: s.date)) }
+        for r in runs where r.completed && r.date >= start { days.insert(cal.startOfDay(for: r.date)) }
+        return days.count
+    }
 
     var body: some View {
-        NavigationStack {
-            List {
-                heroHeader
-
-                Section {
-                    statRow(icon: "flame.fill", title: "This week",
-                            value: "\(workoutsThisWeek)", unit: "workouts")
-                    statRow(icon: "shoeprints.fill", title: "Steps", value: "\(health.todaySteps)", unit: "")
-                } header: { sectionTitle("Today") }
-
-                Section {
-                    WorkoutHeatmap(weeks: 53, cell: 11)
-                        .padding(.vertical, 2)
-                } header: {
-                    sectionTitle("Your year")
-                } footer: {
-                    HeatmapLegend()
-                }
-
-                if !todaySessions.isEmpty || !todayRuns.isEmpty {
-                    Section {
-                        ForEach(todaySessions) { s in
-                            Label(s.templateTitle.isEmpty ? "Workout" : s.templateTitle,
-                                  systemImage: "dumbbell.fill")
-                        }
-                        ForEach(todayRuns) { run in
-                            Label {
-                                Text("\(run.name.isEmpty ? "Run" : run.name) · \(run.actualDistanceKm ?? 0, specifier: "%.1f") km")
-                            } icon: {
-                                Image(systemName: "figure.run")
-                            }
-                        }
-                    } header: { sectionTitle("Logged today") }
-                }
-
-                Section {
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Label("Water", systemImage: "drop.fill")
-                            Spacer()
-                            Text("\(Int(waterToday)) / \(Int(config.waterGoalML)) ml")
-                                .font(.subheadline).foregroundStyle(.secondary)
-                        }
-                        ProgressView(value: min(waterToday / max(config.waterGoalML, 1), 1))
-                            .tint(config.theme.accent)
-                    }
-                    .padding(.vertical, 2)
-
-                    if let latest = metrics.first {
-                        HStack {
-                            Label("Weight", systemImage: "scalemass.fill")
-                            Spacer()
-                            Text(WeightFormat.display(latest.weightKg, metric: config.useMetric))
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                } header: { sectionTitle("Habits") }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 15) {
+                hero
+                statRow
+                yearCard
+                habitsCard
             }
-            .listStyle(.insetGrouped)
-            .scrollContentBackground(.hidden)
-            .airyBackground(config.theme)
-            .navigationTitle("")
-            .toolbar(.hidden, for: .navigationBar)
-            .refreshable {
-                if health.authorized { await health.refreshTodaySteps() }
+            .padding(.horizontal, 20)
+            .padding(.top, 8)
+            .padding(.bottom, 24)
+        }
+        .background(t.page.ignoresSafeArea())
+        .refreshable { if health.authorized { await health.refreshTodaySteps() } }
+        .task { if health.authorized { await health.refreshTodaySteps() } }
+    }
+
+    // MARK: - Sections
+
+    private var hero: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            Text(greeting).font(.serif(31)).foregroundStyle(t.ink)
+            Text(Date().formatted(.dateTime.weekday(.wide).month(.wide).day()))
+                .font(.sans(14, .medium)).foregroundStyle(t.ink2)
+        }
+        .padding(.vertical, 6)
+    }
+
+    private var statRow: some View {
+        HStack(spacing: 13) {
+            statTile(title: "This week", value: "\(workoutsThisWeek)", sub: "workouts", bg: t.accentSoft2)
+            statTile(title: "Steps today", value: stepsString, sub: "Apple Health", bg: t.secondarySoft)
+        }
+    }
+
+    private var yearCard: some View {
+        VStack(alignment: .leading, spacing: 13) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("Your year").font(.serif(17)).foregroundStyle(t.ink)
+                Spacer()
+                Text("\(activeDays) active days").font(.sans(11, .semibold)).foregroundStyle(t.ink2)
             }
-            .task {
-                if health.authorized { await health.refreshTodaySteps() }
+            HStack(spacing: 0) {
+                ForEach(Calendar.current.shortMonthSymbols, id: \.self) { m in
+                    Text(m).font(.sans(8.5, .semibold)).foregroundStyle(t.ink2)
+                        .frame(maxWidth: .infinity)
+                }
+            }
+            WorkoutHeatmap(weeks: 53, cell: 4, showMonthLabels: false)
+            HStack { Spacer(); HeatmapLegend() }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .glowCard(t, padding: 16, radius: 22)
+    }
+
+    private var habitsCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Text("Habits").font(.serif(17)).foregroundStyle(t.ink)
+
+            VStack(spacing: 8) {
+                HStack {
+                    Text("💧 Water").font(.sans(13, .semibold)).foregroundStyle(t.ink)
+                    Spacer()
+                    Text("\(Int(waterToday)) / \(Int(config.waterGoalML)) ml")
+                        .font(.sans(13, .semibold)).foregroundStyle(t.ink2)
+                }
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Capsule().fill(t.accentSoft2)
+                        Capsule().fill(t.secondary)
+                            .frame(width: geo.size.width * min(waterToday / max(config.waterGoalML, 1), 1))
+                    }
+                }
+                .frame(height: 10)
+            }
+
+            Divider().overlay(t.ring)
+
+            HStack {
+                Text("⚖️ Body weight").font(.sans(13, .semibold)).foregroundStyle(t.ink)
+                Spacer()
+                if let latest = metrics.first {
+                    Text(WeightFormat.display(latest.weightKg, metric: config.useMetric))
+                        .font(.sans(15, .semibold)).foregroundStyle(t.ink)
+                } else {
+                    Text("—").foregroundStyle(t.ink2)
+                }
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .glowCard(t, padding: 16, radius: 22)
     }
 
     // MARK: - Pieces
 
-    private var heroHeader: some View {
+    private func statTile(title: String, value: String, sub: String, bg: Color) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(greeting)
-                .font(.largeTitle.bold())
-            Text(Date().formatted(.dateTime.weekday(.wide).month(.wide).day()))
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            Text(title).font(.sans(12, .semibold)).foregroundStyle(t.ink2)
+            Text(value).font(.serif(34)).foregroundStyle(t.ink)
+            Text(sub).font(.sans(12, .medium)).foregroundStyle(t.ink2)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.vertical, 8)
-        .listRowBackground(Color.clear)
-        .listRowSeparator(.hidden)
+        .padding(15)
+        .background(bg, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private var stepsString: String {
+        let f = NumberFormatter(); f.numberStyle = .decimal
+        return f.string(from: NSNumber(value: health.todaySteps)) ?? "\(health.todaySteps)"
     }
 
     private var greeting: String {
@@ -125,24 +149,6 @@ struct TodayView: View {
         case 12..<17: "Good afternoon 🌸"
         case 17..<22: "Good evening 🌙"
         default: "Hey 💪"
-        }
-    }
-
-    private func sectionTitle(_ text: String) -> some View {
-        Text(text)
-            .font(.subheadline.weight(.semibold))
-            .foregroundStyle(config.theme.accent)
-            .textCase(nil)
-    }
-
-    private func statRow(icon: String, title: String, value: String, unit: String) -> some View {
-        HStack {
-            Label(title, systemImage: icon)
-            Spacer()
-            Text(value).font(.title3.bold()).monospacedDigit()
-            if !unit.isEmpty {
-                Text(unit).font(.caption).foregroundStyle(.secondary)
-            }
         }
     }
 }

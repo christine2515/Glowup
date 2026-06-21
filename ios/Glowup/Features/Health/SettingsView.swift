@@ -13,19 +13,20 @@ struct SettingsView: View {
                     } label: {
                         HStack(spacing: 12) {
                             ThemeSwatch(theme: theme)
-                            Text(theme.name)
-                                .foregroundStyle(.primary)
+                            Text("\(theme.emoji)  \(theme.name)")
+                                .font(.sans(15, .semibold))
+                                .foregroundStyle(config.theme.ink)
                             Spacer()
                             if config.themeID == theme.id {
                                 Image(systemName: "checkmark")
                                     .foregroundStyle(theme.accent)
-                                    .fontWeight(.semibold)
+                                    .fontWeight(.bold)
                             }
                         }
                     }
                 }
             } header: {
-                Text("Theme")
+                Text("Theme").sectionLabel().foregroundStyle(config.theme.ink2)
             }
 
             Section {
@@ -63,30 +64,18 @@ struct SettingsView: View {
         }
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
+        .tint(config.theme.accent)
+        .airyBackground(config.theme)
     }
 }
 
-/// A small preview chip showing a theme's wash + macro colors.
+/// A rounded gradient chip previewing a theme's accent → secondary.
 struct ThemeSwatch: View {
     let theme: AppTheme
 
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(theme.wash)
-            HStack(spacing: 3) {
-                Circle().fill(theme.calories)
-                Circle().fill(theme.protein)
-                Circle().fill(theme.carbs)
-                Circle().fill(theme.fat)
-            }
-            .frame(height: 8)
-            .padding(.horizontal, 6)
-        }
-        .frame(width: 56, height: 32)
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .strokeBorder(theme.accent.opacity(0.4), lineWidth: 1)
-        )
+        RoundedRectangle(cornerRadius: 9, style: .continuous)
+            .fill(theme.swatch)
+            .frame(width: 32, height: 32)
     }
 }

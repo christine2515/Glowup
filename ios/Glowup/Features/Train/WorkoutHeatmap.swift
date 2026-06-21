@@ -87,13 +87,10 @@ struct WorkoutHeatmap: View {
     }
 
     private func color(for day: Date, count: Int, today: Date) -> Color {
-        if day > today { return Color.gray.opacity(0.05) }   // future
-        switch count {
-        case 0: return Color.gray.opacity(0.13)
-        case 1: return config.theme.heat.opacity(0.4)
-        case 2: return config.theme.heat.opacity(0.7)
-        default: return config.theme.heat
-        }
+        let hm = config.theme.hm
+        if day > today { return hm[0].opacity(0.4) }   // future
+        let level = min(max(count, 0), hm.count - 1)
+        return hm[level]
     }
 }
 
@@ -102,12 +99,9 @@ struct HeatmapLegend: View {
     @State private var config = AppConfig.shared
     var body: some View {
         HStack(spacing: 4) {
-            Text("Less").font(.caption2).foregroundStyle(.secondary)
-            swatch(Color.gray.opacity(0.13))
-            swatch(config.theme.heat.opacity(0.4))
-            swatch(config.theme.heat.opacity(0.7))
-            swatch(config.theme.heat)
-            Text("More").font(.caption2).foregroundStyle(.secondary)
+            Text("Less").font(.sans(10, .semibold)).foregroundStyle(config.theme.ink2)
+            ForEach(config.theme.hm, id: \.self) { swatch($0) }
+            Text("More").font(.sans(10, .semibold)).foregroundStyle(config.theme.ink2)
         }
     }
     private func swatch(_ c: Color) -> some View {
