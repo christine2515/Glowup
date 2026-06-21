@@ -1,10 +1,14 @@
-# ReelFit
+# Glowup
 
 Capture workouts from Instagram reels and organize your training: reel-import →
 AI-structured workouts → categorized library → daily training log, run planning
 (incl. Strava import), rep/strength progress, a workout calendar, plus water,
 body weight, and Apple Health steps. Designed to be light and airy with
 selectable color themes.
+
+> The app's display name is **Glowup**. Internal identifiers and folders still
+> use the original `ReelFit` name (Xcode project, bundle id `com.reelfit.app`,
+> app group, repo dir) so the build, paths, and commands below are unchanged.
 
 > Focused on training. The Nutrition tab and supplement tracking were removed;
 > the backend still exposes `/nutrition/*` endpoints but the app no longer

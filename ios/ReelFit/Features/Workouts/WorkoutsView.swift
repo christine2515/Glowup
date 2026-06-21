@@ -30,7 +30,7 @@ struct WorkoutsView: View {
                     ContentUnavailableView(
                         "No workouts yet",
                         systemImage: "dumbbell",
-                        description: Text("Share an Instagram reel to ReelFit, or tap + to add one.")
+                        description: Text("Share an Instagram reel to Glowup, or tap + to add one.")
                     )
                 }
 

@@ -37,7 +37,7 @@ struct SettingsView: View {
             } header: {
                 Text("Backend")
             } footer: {
-                Text("The ReelFit backend that extracts workouts and suggests meals. Run it on your Mac and enter its address (e.g. your Mac's local IP).")
+                Text("The Glowup backend that extracts workouts from reels. Run it on your Mac and enter its address (e.g. your Mac's local IP).")
             }
 
             Section("Units") {

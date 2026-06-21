@@ -1,4 +1,4 @@
-# ReelFit — Known Limitations & Caveats
+# Glowup (internally "ReelFit") — Known Limitations & Caveats
 
 Last updated: 2026-06-18. Keep this in mind when using or extending the app.
 

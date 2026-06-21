@@ -48,7 +48,7 @@ final class ShareViewController: UIViewController {
                 return
             }
             ShareInbox.enqueue(SharedReel(url: url, sharedText: text))
-            self?.showToast("Saved to ReelFit ✓") { self?.complete(success: true) }
+            self?.showToast("Saved to Glowup ✓") { self?.complete(success: true) }
         }
     }
 

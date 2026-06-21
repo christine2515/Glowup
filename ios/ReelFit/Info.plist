@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDisplayName</key>
-	<string>ReelFit</string>
+	<string>Glowup</string>
 	<key>CFBundleName</key>
-	<string>ReelFit</string>
+	<string>Glowup</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -45,8 +45,8 @@
 		</dict>
 	</array>
 	<key>NSHealthShareUsageDescription</key>
-	<string>ReelFit reads your step count and body data to show your daily activity and progress.</string>
+	<string>Glowup reads your step count and body data to show your daily activity and progress.</string>
 	<key>NSHealthUpdateUsageDescription</key>
-	<string>ReelFit can save body-weight entries you log to Apple Health.</string>
+	<string>Glowup can save body-weight entries you log to Apple Health.</string>
 </dict>
 </plist>
