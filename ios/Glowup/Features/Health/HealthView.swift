@@ -8,11 +8,19 @@ struct HealthView: View {
     @State private var health = HealthKitManager.shared
 
     @Query private var waterLogs: [WaterLog]
+    @Query private var proteinLogs: [ProteinLog]
+    @Query(sort: \Supplement.order) private var supplements: [Supplement]
     @Query(sort: \BodyMetric.date, order: .reverse) private var metrics: [BodyMetric]
+
+    @State private var showCustomProtein = false
+    @State private var customProtein = ""
 
     private var t: AppTheme { config.theme }
     private var waterToday: Double {
         waterLogs.filter { Calendar.current.isDateInToday($0.date) }.reduce(0) { $0 + $1.amountML }
+    }
+    private var proteinToday: Double {
+        proteinLogs.filter { Calendar.current.isDateInToday($0.date) }.reduce(0) { $0 + $1.grams }
     }
 
     var body: some View {
@@ -23,6 +31,8 @@ struct HealthView: View {
 
                     healthCard
                     waterCard
+                    proteinCard
+                    supplementsCard
                     weightCard
 
                     NavigationLink {
@@ -45,6 +55,16 @@ struct HealthView: View {
             .background(t.page.ignoresSafeArea())
             .navigationBarHidden(true)
             .task { if health.authorized { await health.refreshTodaySteps() } }
+            .alert("Add protein", isPresented: $showCustomProtein) {
+                TextField("grams", text: $customProtein).keyboardType(.numberPad)
+                Button("Add") {
+                    if let g = Double(customProtein), g > 0 {
+                        context.insert(ProteinLog(date: Date(), grams: g))
+                    }
+                    customProtein = ""
+                }
+                Button("Cancel", role: .cancel) { customProtein = "" }
+            }
         }
     }
 
@@ -106,6 +126,126 @@ struct HealthView: View {
                 .padding(.horizontal, 14).padding(.vertical, 8)
                 .background(t.accentSoft2, in: Capsule())
         }
+    }
+
+    // MARK: - Protein
+
+    private var proteinCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("🥚 Protein").font(.sans(13, .semibold)).foregroundStyle(t.ink)
+                Spacer()
+                Text("\(Int(proteinToday)) / \(Int(config.proteinGoalG)) g")
+                    .font(.sans(13, .semibold)).foregroundStyle(t.ink2)
+            }
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(t.accentSoft2)
+                    Capsule().fill(t.accent)
+                        .frame(width: geo.size.width * min(proteinToday / max(config.proteinGoalG, 1), 1))
+                }
+            }
+            .frame(height: 10)
+            HStack(spacing: 10) {
+                quickProtein(20)
+                quickProtein(30)
+                Button { showCustomProtein = true } label: {
+                    Text("Custom").font(.sans(12, .bold)).foregroundStyle(t.accentDeep)
+                        .padding(.horizontal, 14).padding(.vertical, 8)
+                        .background(t.accentSoft2, in: Capsule())
+                }
+                Spacer()
+                if proteinToday > 0 {
+                    Button { undoProtein() } label: {
+                        Text("Undo").font(.sans(12, .bold)).foregroundStyle(t.ink2)
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .glowCard(t, padding: 16, radius: 20)
+    }
+
+    private func quickProtein(_ g: Double) -> some View {
+        Button { context.insert(ProteinLog(date: Date(), grams: g)) } label: {
+            Text("+\(Int(g)) g").font(.sans(12, .bold)).foregroundStyle(t.accentDeep)
+                .padding(.horizontal, 14).padding(.vertical, 8)
+                .background(t.accentSoft2, in: Capsule())
+        }
+    }
+
+    private func undoProtein() {
+        let todays = proteinLogs.filter { Calendar.current.isDateInToday($0.date) }
+            .sorted { $0.date < $1.date }
+        if let last = todays.last { context.delete(last) }
+    }
+
+    // MARK: - Supplements
+
+    private var supplementsCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Supplements").sectionLabel().foregroundStyle(t.ink2)
+
+            if supplements.isEmpty {
+                Text("Track fiber, collagen, vitamins and more.")
+                    .font(.sans(13, .medium)).foregroundStyle(t.ink2)
+            } else {
+                ForEach(supplements) { supp in
+                    supplementRow(supp)
+                }
+            }
+
+            NavigationLink {
+                SupplementsManageView()
+            } label: {
+                Text(supplements.isEmpty ? "Add a supplement" : "Manage supplements")
+                    .font(.sans(13, .bold)).foregroundStyle(t.accentDeep)
+                    .frame(maxWidth: .infinity).padding(11)
+                    .background(t.accentSoft2, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+            }
+            .buttonStyle(.plain)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .glowCard(t, padding: 16, radius: 20)
+    }
+
+    private func supplementRow(_ supp: Supplement) -> some View {
+        let taken = supp.takenCount()
+        let done = taken >= supp.dailyTarget
+        return HStack(spacing: 10) {
+            Text(supp.emoji)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(supp.name).font(.sans(14, .semibold)).foregroundStyle(t.ink)
+                if !supp.dose.isEmpty {
+                    Text(supp.dose).font(.sans(11, .medium)).foregroundStyle(t.ink2)
+                }
+            }
+            Spacer()
+            Text("\(taken)/\(supp.dailyTarget)")
+                .font(.sans(13, .bold)).monospacedDigit()
+                .foregroundStyle(done ? t.accent : t.ink2)
+            Button {
+                if done { undoSupplement(supp) } else { takeSupplement(supp) }
+            } label: {
+                Image(systemName: done ? "checkmark.circle.fill" : "plus.circle.fill")
+                    .font(.system(size: 24))
+                    .foregroundStyle(done ? t.accent : t.accentSoft)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.vertical, 2)
+    }
+
+    private func takeSupplement(_ supp: Supplement) {
+        let log = SupplementLog(date: Date())
+        log.supplement = supp
+        context.insert(log)
+    }
+
+    private func undoSupplement(_ supp: Supplement) {
+        let todays = (supp.logs ?? []).filter { Calendar.current.isDateInToday($0.date) }
+            .sorted { $0.date < $1.date }
+        if let last = todays.last { context.delete(last) }
     }
 
     private var weightCard: some View {

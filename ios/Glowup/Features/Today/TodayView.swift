@@ -7,6 +7,8 @@ struct TodayView: View {
     @State private var health = HealthKitManager.shared
 
     @Query private var waterLogs: [WaterLog]
+    @Query private var proteinLogs: [ProteinLog]
+    @Query private var supplements: [Supplement]
     @Query(sort: \WorkoutSession.date, order: .reverse) private var sessions: [WorkoutSession]
     @Query(sort: \BodyMetric.date, order: .reverse) private var metrics: [BodyMetric]
     @Query private var runs: [RunEntry]
@@ -15,6 +17,12 @@ struct TodayView: View {
 
     private var waterToday: Double {
         waterLogs.filter { Calendar.current.isDateInToday($0.date) }.reduce(0) { $0 + $1.amountML }
+    }
+    private var proteinToday: Double {
+        proteinLogs.filter { Calendar.current.isDateInToday($0.date) }.reduce(0) { $0 + $1.grams }
+    }
+    private var supplementsTaken: Int {
+        supplements.filter { $0.takenCount() >= $0.dailyTarget && $0.dailyTarget > 0 }.count
     }
     private var workoutsThisWeek: Int {
         let cal = Calendar.current
@@ -91,21 +99,18 @@ struct TodayView: View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Habits").font(.serif(17)).foregroundStyle(t.ink)
 
-            VStack(spacing: 8) {
+            habitBar(icon: "💧 Water", value: waterToday, goal: config.waterGoalML,
+                     unit: "ml", fill: t.secondary)
+            habitBar(icon: "🥚 Protein", value: proteinToday, goal: config.proteinGoalG,
+                     unit: "g", fill: t.accent)
+
+            if !supplements.isEmpty {
                 HStack {
-                    Text("💧 Water").font(.sans(13, .semibold)).foregroundStyle(t.ink)
+                    Text("💊 Supplements").font(.sans(13, .semibold)).foregroundStyle(t.ink)
                     Spacer()
-                    Text("\(Int(waterToday)) / \(Int(config.waterGoalML)) ml")
+                    Text("\(supplementsTaken)/\(supplements.count) taken")
                         .font(.sans(13, .semibold)).foregroundStyle(t.ink2)
                 }
-                GeometryReader { geo in
-                    ZStack(alignment: .leading) {
-                        Capsule().fill(t.accentSoft2)
-                        Capsule().fill(t.secondary)
-                            .frame(width: geo.size.width * min(waterToday / max(config.waterGoalML, 1), 1))
-                    }
-                }
-                .frame(height: 10)
             }
 
             Divider().overlay(t.ring)
@@ -126,6 +131,25 @@ struct TodayView: View {
     }
 
     // MARK: - Pieces
+
+    private func habitBar(icon: String, value: Double, goal: Double, unit: String, fill: Color) -> some View {
+        VStack(spacing: 8) {
+            HStack {
+                Text(icon).font(.sans(13, .semibold)).foregroundStyle(t.ink)
+                Spacer()
+                Text("\(Int(value)) / \(Int(goal)) \(unit)")
+                    .font(.sans(13, .semibold)).foregroundStyle(t.ink2)
+            }
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(t.accentSoft2)
+                    Capsule().fill(fill)
+                        .frame(width: geo.size.width * min(value / max(goal, 1), 1))
+                }
+            }
+            .frame(height: 10)
+        }
+    }
 
     private func statTile(title: String, value: String, sub: String, bg: Color) -> some View {
         VStack(alignment: .leading, spacing: 4) {

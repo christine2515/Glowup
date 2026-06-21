@@ -49,9 +49,11 @@ struct SettingsView: View {
                 .pickerStyle(.segmented)
             }
 
-            Section("Water goal") {
-                Stepper("\(Int(config.waterGoalML)) ml/day",
+            Section("Daily goals") {
+                Stepper("Water: \(Int(config.waterGoalML)) ml",
                         value: $config.waterGoalML, in: 500...6000, step: 250)
+                Stepper("Protein: \(Int(config.proteinGoalG)) g",
+                        value: $config.proteinGoalG, in: 20...400, step: 5)
             }
 
             Section {

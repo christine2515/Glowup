@@ -16,6 +16,14 @@ struct WeightView: View {
 
     var body: some View {
         List {
+            Section("Units") {
+                Picker("Units", selection: $config.useMetric) {
+                    Text("kg").tag(true)
+                    Text("lb").tag(false)
+                }
+                .pickerStyle(.segmented)
+            }
+
             Section("Log weight") {
                 HStack {
                     TextField("0", value: $newWeight, format: .number)

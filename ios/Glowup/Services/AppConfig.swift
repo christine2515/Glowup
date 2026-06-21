@@ -28,6 +28,11 @@ final class AppConfig {
         didSet { defaults.set(waterGoalML, forKey: "waterGoalML") }
     }
 
+    /// Daily protein goal in grams.
+    var proteinGoalG: Double {
+        didSet { defaults.set(proteinGoalG, forKey: "proteinGoalG") }
+    }
+
     /// Selected color theme id (see AppTheme.all).
     var themeID: String {
         didSet { defaults.set(themeID, forKey: "themeID") }
@@ -51,6 +56,7 @@ final class AppConfig {
         apiToken = defaults.string(forKey: "apiToken") ?? ""
         useMetric = defaults.object(forKey: "useMetric") as? Bool ?? true
         waterGoalML = defaults.object(forKey: "waterGoalML") as? Double ?? 2500
+        proteinGoalG = defaults.object(forKey: "proteinGoalG") as? Double ?? 120
         themeID = defaults.string(forKey: "themeID") ?? AppTheme.fairy.id
         useICloudSync = defaults.bool(forKey: AppConfig.iCloudKey)
     }

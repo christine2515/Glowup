@@ -28,6 +28,7 @@ struct GlowupApp: App {
             WorkoutTemplate.self, Exercise.self,
             WorkoutSession.self, SetLog.self, RunEntry.self,
             BodyMetric.self, WaterLog.self,
+            ProteinLog.self, Supplement.self, SupplementLog.self,
         ])
 
         if AppConfig.iCloudSyncEnabled {
